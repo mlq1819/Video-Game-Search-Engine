@@ -34,13 +34,13 @@ body{
     float: right;
 }
 
-.searchclick button[type=button] {
+.searchclick button[type=submit] {
     margin: 0px;
     width: 100%;
     height: 100%;
     color: #009fbe;
 }
 
-.searchclick button[type=button]:hover {
+.searchclick button[type=submit]:hover {
     color: #d2f9fe;
 }

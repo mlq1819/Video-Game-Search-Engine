@@ -35,6 +35,7 @@
   <ItemGroup>
     <Content Include="templates\index.html" />
     <Content Include="static\css\SearchEngine.css" />
+    <Content Include="templates\result.html" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="static\" />
