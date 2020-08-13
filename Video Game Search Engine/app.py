@@ -1,13 +1,12 @@
 
-from flask import Flask
+from flask import Flask, render_template
 app = Flask(__name__)
 
 @app.route('/')
-@app.route('/home')
+@app.route('/index')
+def index():
 
-def home():
-
-	return "returned home"
+	return render_template('index.html', title="Welcome");
 
 if __name__ == '__main__':
-	app.run('localhost',5050)
+	app.run('localhost',5050) #5050 is what is currently set in the project Debug port number settings

@@ -1,0 +1,46 @@
+body{
+    width: 100%;
+    height: auto;
+    margin: auto;
+}
+
+.search {
+    width: 50%;
+    height: auto;
+    vertical-align: middle;
+    margin: auto;
+    position: center;
+}
+
+.searchbar {
+    width: 90%;
+    height: 100%;
+    float: left;
+}
+
+.searchbar input[type=text]{
+    float: right;
+    padding: 6px;
+    border: thin;
+    font-size: 22px;
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+}
+
+.searchclick {
+    width: 10%;
+    height: 100%;
+    float: right;
+}
+
+.searchclick button[type=button] {
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+    color: #009fbe;
+}
+
+.searchclick button[type=button]:hover {
+    color: #d2f9fe;
+}
