@@ -46,7 +46,7 @@ def is_numeric(str):
 	
 #either removes quotation marks and returns a string, or attempts to convert to an int
 def convert_to_type(object):
-	if object[0] == '"' and object[len(object)-1] == '"':
+	if len(object)>=2 and object[0] == '"' and object[-1] == '"':
 		return object[1:len(object)-1]
 	else:
 		if is_numeric(object):
@@ -65,9 +65,9 @@ def add_games(results):
 	while index >= 0 and index < len(results):
 		if results[index] == '[':
 			index+=1
-			while results[index] != ']':
+			while index < len(results) and results[index] != ']':
 				start = index
-				while results[index] != ',':
+				while results[index] != ',' and results[index] != ']':
 					if response[index] == '[' or response[index] == '{':
 						folding = []
 						if response[index] == '[':
@@ -77,7 +77,7 @@ def add_games(results):
 						while len(folding)>0:
 							index+=1
 							if response[index] == folding[-1]:
-								del folding[-1]
+								folding.pop(-1)
 							elif len(folding) == 1 and folding[-1] == ']' and response[index] == ',':
 								subobjects.append(index)
 							else:
@@ -104,6 +104,8 @@ def add_games(results):
 						i2+=1
 				t = (name,data)
 				games.append(game(t))
+				index+=1
+			index+=1
 		index+=1
 
 #Should convert information from response into a list of result objects
@@ -117,9 +119,9 @@ def parse(response):
 	while index >= 0 and index < len(response):
 		if response[index] == '{':
 			index+=1
-			while response[index] != '}':
+			while index < len(response) and response[index] != '}':
 				start = index
-				while response[index] != ',':
+				while response[index] != ',' and response[index] != '}':
 					if response[index] == '[' or response[index] == '{':
 						folding = []
 						if response[index] == '[':
@@ -129,7 +131,7 @@ def parse(response):
 						while len(folding)>0:
 							index+=1
 							if response[index] == folding[-1]:
-								del folding[-1]
+								folding.pop(-1)
 							else:
 								if response[index] == '[':
 									folding.append(']')
@@ -142,10 +144,11 @@ def parse(response):
 				name = convert_to_type(response[start:middle])
 				data = convert_to_type(response[middle+1:end])
 				t = (name,data)
-				output.append(resultitem(t))
+				output.append(t)
 				index+=1
+			index+=1
 		index+=1
-	return output
+	return resultitem(output)
 
 #Entry point into application; downloads and parses API data before starting the web application
 if __name__ == '__main__':
