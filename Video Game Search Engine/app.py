@@ -68,22 +68,22 @@ def add_games(results):
 			while index < len(results) and results[index] != ']':
 				start = index
 				while results[index] != ',' and results[index] != ']':
-					if response[index] == '[' or response[index] == '{':
+					if results[index] == '[' or results[index] == '{':
 						folding = []
-						if response[index] == '[':
+						if results[index] == '[':
 							folding.append(']')
 						else:
 							folding.append('}')
 						while len(folding)>0:
 							index+=1
-							if response[index] == folding[-1]:
+							if results[index] == folding[-1]:
 								folding.pop(-1)
-							elif len(folding) == 1 and folding[-1] == ']' and response[index] == ',':
+							elif len(folding) == 1 and folding[-1] == ']' and results[index] == ',':
 								subobjects.append(index)
 							else:
-								if response[index] == '[':
+								if results[index] == '[':
 									folding.append(']')
-								elif response[index] == '{':
+								elif results[index] == '{':
 									folding.append('}')
 					if results[index] == ':':
 						middle = index
