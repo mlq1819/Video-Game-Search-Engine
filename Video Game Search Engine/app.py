@@ -173,7 +173,7 @@ def parse(response):
 								elif folding[-1]!='\"':
 									if response[index] == '[':
 										folding.append(']')
-									elif results[index] == '{':
+									elif response[index] == '{':
 										folding.append('}')
 					elif response[index] == ':' and not found_middle:
 						middle = index
