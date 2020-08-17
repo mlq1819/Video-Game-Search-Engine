@@ -153,8 +153,8 @@ def parse(response):
 					print("\tAt section starting with \"" + response[start:start+10] + "\"")
 				found_middle = False
 				outside_string = True
-				while response[index] != ',' and response[index] != '}':
-					if response[index] == '[' or response[index] == '{':
+				while response[index] != ',' and response[index] != '}': #loop within fields to find middle and end points
+					if response[index] == '[' or response[index] == '{': #folder loop
 						folding = []
 						if response[index] == '[':
 							folding.append(']')
@@ -169,9 +169,9 @@ def parse(response):
 									folding.append(']')
 								elif response[index] == '{':
 									folding.append('}')
-					elif results[index] == '\"':
-								outside_string = not outside_string
-					elif results[index] == ':' and not found_middle and outside_string:
+					elif response[index] == '\"':
+						outside_string = not outside_string
+					elif response[index] == ':' and not found_middle and outside_string:
 						middle = index
 						found_middle = True
 					index+=1
