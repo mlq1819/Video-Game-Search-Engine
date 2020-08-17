@@ -28,6 +28,14 @@ def result():
 	else:
 		return index()
 
+	
+#either removes quotation marks and returns a string, or attempts to convert to an int
+def convert_to_type(object):
+	if object[0] == '"' and object[len(object)-1] == '"':
+		return object[1:len(object)-1]
+	else:
+		return int(object)
+
 #takes a string of results and adds games from the generated list
 #results should be formatted as such: [{"Name":Data,"Name":Data,"Name":Data},{"Name":Data,"Name":Data,"Name":Data},{"Name":Data,"Name":Data,"Name":Data}]
 def add_games(results):
@@ -53,20 +61,20 @@ def add_games(results):
 					if results[index] == ':':
 						middle = index
 					index+=1
-				name = results[start:middle]
+				name = convert_to_type(results[start:middle])
 				data
 				if len(subobjects) == 0:
-					data = results[middle+1, end]
+					data = convert_to_type(results[middle+1, end])
 				else:
 					i2 = 0
 					data = []
 					while i2 < len(subojects):
 						if i2 == 0:
-							data.append(results[middle+1:subobjects[i2]])
+							data.append(convert_to_type(results[middle+1:subobjects[i2]]))
 						else:
-							data.append(results[subobjects[i2-1]+1:subobjects[i2]])
+							data.append(convert_to_type(results[subobjects[i2-1]+1:subobjects[i2]]))
 						i2+=1
-				games.append(game(name, data))
+				games.append(game((name, data)))
 		index+=1
 
 #Should convert information from response into a list of result objects
@@ -92,9 +100,9 @@ def parse(response):
 					if response[index] == ':':
 						middle = index
 					index+=1
-				name = response[start:middle]
-				data = response[middle+1:end]
-				output.append(result(name, data))
+				name = convert_to_type(response[start:middle])
+				data = convert_to_type(response[middle+1:end])
+				output.append(result((name, data)))
 		index+=1
 	return output
 
@@ -113,7 +121,7 @@ if __name__ == '__main__':
 			#https://www.giantbomb.com/api/games/?api_key=6fe6fb576b0c7bef2364938b2248e1628759508d&format=json&platforms=21
 			print(url)
 			response = requests.get(url, headers=headers)
-			results = parse(response)
+			results = parse(response.text)
 			num_results = len(results)
 			if response.status_code == 200 or response.status_code == 301:
 				add_games(results.Get("results"))
