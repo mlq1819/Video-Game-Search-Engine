@@ -61,6 +61,7 @@ def add_games(results):
 					if results[index] == ':':
 						middle = index
 					index+=1
+				end = index
 				name = convert_to_type(results[start:middle])
 				data
 				if len(subobjects) == 0:
@@ -100,6 +101,7 @@ def parse(response):
 					if response[index] == ':':
 						middle = index
 					index+=1
+				end = index
 				name = convert_to_type(response[start:middle])
 				data = convert_to_type(response[middle+1:end])
 				output.append(result((name, data)))
