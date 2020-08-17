@@ -28,13 +28,31 @@ def result():
 	else:
 		return index()
 
+def is_numeric(str):
+	dot=False
+	first=True
+	for c in str:
+		if not c.isDigit:
+			if c == '.':
+				if dot:
+					return False
+				else:
+					dot = True
+			elif not first or c != '-':
+				return False
+		first = False
+	return True
+
 	
 #either removes quotation marks and returns a string, or attempts to convert to an int
 def convert_to_type(object):
 	if object[0] == '"' and object[len(object)-1] == '"':
 		return object[1:len(object)-1]
 	else:
-		return int(object)
+		if is_numeric(object):
+			return int(object)
+		else:
+			return object
 
 #takes a string of results and adds games from the generated list
 #results should be formatted as such: [{"Name":Data,"Name":Data,"Name":Data},{"Name":Data,"Name":Data,"Name":Data},{"Name":Data,"Name":Data,"Name":Data}]
@@ -127,7 +145,7 @@ if __name__ == '__main__':
 			print(url)
 			response = requests.get(url, headers=headers)
 			results = parse(response.text)
-			num_results = len(results)
+			num_results = results.Get("number_of_page_results")
 			if response.status_code == 200 or response.status_code == 301:
 				add_games(results.Get("results"))
 			else:
