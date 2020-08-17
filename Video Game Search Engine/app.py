@@ -32,7 +32,7 @@ def is_numeric(str):
 	dot=False
 	first=True
 	for c in str:
-		if not c.isDigit:
+		if not c.isdigit():
 			if c == '.':
 				if dot:
 					return False
@@ -68,14 +68,23 @@ def add_games(results):
 			while results[index] != ']':
 				start = index
 				while results[index] != ',':
-					if results[index] == '[':
-						while results[index] != ']':
-							if results[index] == ',':
+					if response[index] == '[' or response[index] == '{':
+						folding = []
+						if response[index] == '[':
+							folding.append(']')
+						else:
+							folding.append('}')
+						while len(folding)>0:
+							index+=1
+							if response[index] == folding[-1]:
+								del folding[-1]
+							elif len(folding) == 1 and folding[-1] == ']' and response[index] == ',':
 								subobjects.append(index)
-							index+=1
-					if results[index] == '{':
-						while results[index] != '}':
-							index+=1
+							else:
+								if response[index] == '[':
+									folding.append(']')
+								elif response[index] == '{':
+									folding.append('}')
 					if results[index] == ':':
 						middle = index
 					index+=1
@@ -111,12 +120,21 @@ def parse(response):
 			while response[index] != '}':
 				start = index
 				while response[index] != ',':
-					if response[index] == '[':
-						while response[index] != ']':
+					if response[index] == '[' or response[index] == '{':
+						folding = []
+						if response[index] == '[':
+							folding.append(']')
+						else:
+							folding.append('}')
+						while len(folding)>0:
 							index+=1
-					if response[index] == '{':
-						while response[index] != '}':
-							index+=1
+							if response[index] == folding[-1]:
+								del folding[-1]
+							else:
+								if response[index] == '[':
+									folding.append(']')
+								elif response[index] == '{':
+									folding.append('}')
 					if response[index] == ':':
 						middle = index
 					index+=1
