@@ -78,7 +78,7 @@ def add_games(results):
 						print("\tAt game starting with \"" + results[index:index+25] + "\"")
 					elif index + 10 < len(results):
 						print("\tAt game starting with \"" + results[index:index+10] + "\"")
-					while index < len(results) and results[index] != '}': #loop between fields of game object, within game object
+					while index < len(results) and results[index] != ',': #loop between fields of game object, within game object
 						start = index
 						found_middle = False
 						if index + 10 < len(results):
