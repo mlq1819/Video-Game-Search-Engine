@@ -1,3 +1,5 @@
+from result import result
+
 parsed = []
 key="6fe6fb576b0c7bef2364938b2248e1628759508d"
 baseUrl="https://www.giantbomb.com/api/"
