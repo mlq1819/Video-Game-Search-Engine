@@ -1,4 +1,4 @@
-from result import result
+from result import resultitem
 from game import game
 
 parsed = []
@@ -75,7 +75,8 @@ def add_games(results):
 						else:
 							data.append(convert_to_type(results[subobjects[i2-1]+1:subobjects[i2]]))
 						i2+=1
-				games.append(game((name, data)))
+				t = (name,data)
+				games.append(game(t))
 		index+=1
 
 #Should convert information from response into a list of result objects
@@ -104,7 +105,9 @@ def parse(response):
 				end = index
 				name = convert_to_type(response[start:middle])
 				data = convert_to_type(response[middle+1:end])
-				output.append(result((name, data)))
+				t = (name,data)
+				output.append(resultitem(t))
+				index+=1
 		index+=1
 	return output
 
