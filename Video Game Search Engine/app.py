@@ -28,6 +28,8 @@ def result():
 		return index()
 
 def is_numeric(str):
+	if len(str) == 0:
+		return False
 	dot=False
 	first=True
 	for c in str:
@@ -41,11 +43,10 @@ def is_numeric(str):
 				return False
 		first = False
 	return True
-
 	
 #either removes quotation marks and returns a string, or attempts to convert to an int
 def convert_to_type(object):
-	if len(object)>=2 and object[0] == '"' and object[-1] == '"':
+	if len(object)>=2 and object[0] == '"' and object[len(object)-1] == '"':
 		return object[1:len(object)-1]
 	else:
 		if is_numeric(object):
@@ -61,15 +62,27 @@ def add_games(results):
 	subobjects=[]
 	end = 0
 	index = 0
+	print("Parsing game data...")
 	while index >= 0 and index < len(results):
 		if results[index] == '[':
 			index+=1
-			while index < len(results) and results[index] != ']': #loop between game objects
+			while index < len(results) and results[index] != ']': #loop between game objects, within list of game objects
 				if results[index] == '{': #found a game object
 					output = []
-					while index < len(results) and results[index] != '}': #loop between fields of game object
+					index+=1
+					while index < len(results) and results[index] != '}': #loop between fields of game object, within game object
 						start = index
+						if start + 100 < len(results):
+							print("\tAt game starting with \"" + results[start:start+100] + "\"")
+						elif start + 50 < len(results):
+							print("\tAt game starting with \"" + results[start:start+50] + "\"")
+						elif start + 25 < len(results):
+							print("\tAt game starting with \"" + results[start:start+25] + "\"")
+						elif start + 10 < len(results):
+							print("\tAt game starting with \"" + results[start:start+10] + "\"")
 						while results[index] != ',' and results[index] != ']': #loop within fields
+							if index + 10 < len(results):
+								print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
 							if results[index] == '[' or results[index] == '{':
 								folding = []
 								if results[index] == '[':
@@ -89,28 +102,31 @@ def add_games(results):
 											folding.append('}')
 							if results[index] == ':':
 								middle = index
+							end = index
+							name = convert_to_type(results[start:middle])
+							if len(subobjects) == 0:
+								data = convert_to_type(results[middle+1:end])
+								t = (name,data)
+								output.append(t)
+							else:
+								i2 = 0
+								data = []
+								while i2 < len(subojects):
+									if i2 == 0:
+										data.append(convert_to_type(results[middle+1:subobjects[i2]]))
+									else:
+										data.append(convert_to_type(results[subobjects[i2-1]+1:subobjects[i2]]))
+									i2+=1
+								t = (name,data)
+								output.append(t)
 							index+=1
-						end = index
-						name = convert_to_type(results[start:middle])
-						data
-						if len(subobjects) == 0:
-							data = convert_to_type(results[middle+1, end])
-						else:
-							i2 = 0
-							data = []
-							while i2 < len(subojects):
-								if i2 == 0:
-									data.append(convert_to_type(results[middle+1:subobjects[i2]]))
-								else:
-									data.append(convert_to_type(results[subobjects[i2-1]+1:subobjects[i2]]))
-								i2+=1
-						t = (name,data)
-						output.append(t)
 						index+=1
 					games.append(tuplelist(output))
+					print("Completed parsing of game")
 					index+=1
 				index+=1
 		index+=1
+	print("Completed parsing of game data")
 
 #Should convert information from response into a list of result objects
 #response should be formatted as such: {"Name":Data,"Name":Data,"Name":Data}
@@ -120,11 +136,14 @@ def parse(response):
 	end = 0
 	index = 0
 	output = []
+	print("Parsing response data...")
 	while index >= 0 and index < len(response):
 		if response[index] == '{':
 			index+=1
 			while index < len(response) and response[index] != '}':
 				start = index
+				if start + 10 < len(response):
+					print("\tAt section starting with \"" + response[start:start+10] + "\"")
 				while response[index] != ',' and response[index] != '}':
 					if response[index] == '[' or response[index] == '{':
 						folding = []
@@ -151,6 +170,7 @@ def parse(response):
 				output.append(t)
 				index+=1
 		index+=1
+	print("Completed parsing of data")
 	return tuplelist(output)
 
 #Entry point into application; downloads and parses API data before starting the web application
@@ -167,6 +187,10 @@ if __name__ == '__main__':
 			url = url + "&platforms=" + str(platform)
 			#https://www.giantbomb.com/api/games/?api_key=6fe6fb576b0c7bef2364938b2248e1628759508d&format=json&platforms=21
 			print(url)
+			if offset > 0:
+				print(resource + " : platform " + str(platform) + " : offset " + str(offset))
+			else:
+				print(resource + " : platform " + str(platform))
 			response = requests.get(url, headers=headers)
 			results = parse(response.text)
 			num_results = results.Get("number_of_page_results")
