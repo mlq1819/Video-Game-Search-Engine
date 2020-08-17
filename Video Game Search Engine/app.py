@@ -92,13 +92,13 @@ def add_games(results):
 									folding.append('\"')
 								elif results[index] == '{':
 									folding.append('}')
-								if found_middle and response[start:middle] == "\"description\"":
+								if found_middle and "description" in results[start:middle]:
 									while len(folding)>0:
 										index+=1
-										if response[index] == folding[-1]:
+										if results[index] == folding[-1]:
 											folding.pop(-1)
 										else:
-											if response[index] == "<":
+											if results[index] == "<":
 												folding.append(">")
 								else:
 									while len(folding)>0:
@@ -171,7 +171,7 @@ def parse(response):
 							folding.append('\"')
 						elif response[index] == '{':
 							folding.append('}')
-						if found_middle and response[start:middle] == "\"description\"":
+						if found_middle and "description" in response[start:middle]:
 							while len(folding)>0:
 								index+=1
 								if response[index] == folding[-1]:
