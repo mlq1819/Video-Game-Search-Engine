@@ -128,7 +128,7 @@ def add_games(results):
 						else:
 							i2 = 0
 							data = []
-							while i2 < len(subojects):
+							while i2 < len(subobjects):
 								if i2 == 0:
 									data.append(convert_to_type(results[middle+1:subobjects[i2]]))
 								else:
