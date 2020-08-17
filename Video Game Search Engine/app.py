@@ -80,6 +80,8 @@ def add_games(results):
 						print("\tAt game starting with \"" + results[index:index+10] + "\"")
 					while index < len(results) and results[index] != '}': #loop between fields of game object, within game object
 						start = index
+						found_middle = False
+						outside_string = True
 						if index + 10 < len(results):
 							print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
 						while results[index] != ',' and results[index] != ']': #loop within fields to find middle and end points
@@ -100,8 +102,11 @@ def add_games(results):
 											folding.append(']')
 										elif results[index] == '{':
 											folding.append('}')
-							if results[index] == ':':
+							elif results[index] == '\"':
+								outside_string = not outside_string
+							elif results[index] == ':' and not found_middle and outside_string:
 								middle = index
+								found_middle = True
 							index+=1
 						#At end of field; results[index] is either ',' or ']'
 						end = index
