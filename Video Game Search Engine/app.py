@@ -84,7 +84,7 @@ def add_games(results):
 						outside_string = True
 						if index + 10 < len(results):
 							print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
-						while results[index] != ',' and results[index] != ']': #loop within fields to find middle and end points
+						while results[index] != ',' and (results[index] != ']' or not outside_string): #loop within fields to find middle and end points
 							if results[index] == '[' or results[index] == '{': #folder loop
 								folding = []
 								if results[index] == '[':
@@ -153,7 +153,7 @@ def parse(response):
 					print("\tAt section starting with \"" + response[start:start+10] + "\"")
 				found_middle = False
 				outside_string = True
-				while response[index] != ',' and response[index] != '}': #loop within fields to find middle and end points
+				while response[index] != ',' and (response[index] != '}' or not outside_string): #loop within fields to find middle and end points
 					if response[index] == '[' or response[index] == '{': #folder loop
 						folding = []
 						if response[index] == '[':
