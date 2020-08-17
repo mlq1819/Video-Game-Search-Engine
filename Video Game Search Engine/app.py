@@ -83,7 +83,7 @@ def add_games(results):
 						found_middle = False
 						if index + 10 < len(results):
 							print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
-						while results[index] != ',' and results[index] != ']': #loop within fields to find middle and end points
+						while results[index] != ',' and results[index] != '}': #loop within fields to find middle and end points
 							if results[index] == '[' or results[index] == '{' or (results[index] == '\"' and index==0) or (results[index] == '\"' and results[index-1]!='\''): #folder loop
 								folding = []
 								if results[index] == '[':
@@ -118,7 +118,7 @@ def add_games(results):
 								middle = index
 								found_middle = True
 							index+=1
-						#At end of field; results[index] is either ',' or ']'
+						#At end of field; results[index] is either ',' or '}'
 						end = index
 						name = convert_to_type(results[start:middle])
 						if len(subobjects) == 0:
@@ -137,11 +137,13 @@ def add_games(results):
 							t = (name,data)
 							output.append(t)
 						index+=1
-					#At end of game; results[index] == '}'
+					#At end of game; results[index] == '}'; note: most games will end with a "},{"
 					games.append(tuplelist(output))
 					print("Completed parsing of game")
-					index+=1
+					while results[index] == '}' or results[index] == ',':
+						index+=1
 				index+=1
+		#Possibly at end of list, results[index] may equal ']'
 		index+=1
 	print("Completed parsing of game data")
 
