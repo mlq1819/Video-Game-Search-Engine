@@ -7,6 +7,7 @@ baseUrl="https://www.giantbomb.com/api/"
 resource="games"
 platforms = [21,9,43]
 games = []
+max_elements = 100
 
 import requests
 from flask import Flask, render_template, request
@@ -102,9 +103,9 @@ if __name__ == '__main__':
 	hasnt_failed = True
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # This is chrome, you can set whatever browser you like
 	for platform in platforms:
-		num_results = 100
+		num_results = max_elements
 		offset = 0
-		while(num_results == 100):
+		while(num_results == max_elements):
 			url = baseUrl + resource + "/?api_key=" + key + "&format=json"
 			if offset > 0:
 				url = url + "&offset=" + str(offset)
