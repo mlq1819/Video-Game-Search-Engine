@@ -151,6 +151,8 @@ def parse(response):
 				start = index
 				if start + 10 < len(response):
 					print("\tAt section starting with \"" + response[start:start+10] + "\"")
+				found_middle = False
+				outside_string = True
 				while response[index] != ',' and response[index] != '}':
 					if response[index] == '[' or response[index] == '{':
 						folding = []
@@ -167,8 +169,11 @@ def parse(response):
 									folding.append(']')
 								elif response[index] == '{':
 									folding.append('}')
-					if response[index] == ':':
+					elif results[index] == '\"':
+								outside_string = not outside_string
+					elif results[index] == ':' and not found_middle and outside_string:
 						middle = index
+						found_middle = True
 					index+=1
 				end = index
 				name = convert_to_type(response[start:middle])
