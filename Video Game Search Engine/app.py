@@ -34,7 +34,6 @@ def add_games(results):
 	subobjects=[]
 	end = 0
 	index = 0
-	output = []
 	response = results.results
 	while index >= 0 and index < len(response):
 		if response[index] == '{':
@@ -66,9 +65,8 @@ def add_games(results):
 						else:
 							data.append(response[subobjects[i2-1]+1:subobjects[i2]])
 						i2+=1
-				output.append(game(name, data))
+				games.append(game(name, data))
 		index+=1
-	return output
 
 #Should convert information from response into a result object
 def parse(response):
@@ -98,6 +96,7 @@ def parse(response):
 		index+=1
 	return output
 
+#Entry point into application; downloads and parses API data before starting the web application
 if __name__ == '__main__':
 	hasnt_failed = True
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # This is chrome, you can set whatever browser you like
