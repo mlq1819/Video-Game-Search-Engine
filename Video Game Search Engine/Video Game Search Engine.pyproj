@@ -31,9 +31,6 @@
     <Compile Include="app.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="game.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="result.py">
       <SubType>Code</SubType>
     </Compile>

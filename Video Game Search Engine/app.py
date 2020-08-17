@@ -1,5 +1,4 @@
-from result import resultitem
-from game import game
+from result import tuplelist
 
 parsed = []
 key="6fe6fb576b0c7bef2364938b2248e1628759508d"
@@ -65,47 +64,52 @@ def add_games(results):
 	while index >= 0 and index < len(results):
 		if results[index] == '[':
 			index+=1
-			while index < len(results) and results[index] != ']':
-				start = index
-				while results[index] != ',' and results[index] != ']':
-					if results[index] == '[' or results[index] == '{':
-						folding = []
-						if results[index] == '[':
-							folding.append(']')
-						else:
-							folding.append('}')
-						while len(folding)>0:
-							index+=1
-							if results[index] == folding[-1]:
-								folding.pop(-1)
-							elif len(folding) == 1 and folding[-1] == ']' and results[index] == ',':
-								subobjects.append(index)
-							else:
+			while index < len(results) and results[index] != ']': #loop between game objects
+				if results[index] == '{': #found a game object
+					output = []
+					while index < len(results) and results[index] != '}': #loop between fields of game object
+						start = index
+						while results[index] != ',' and results[index] != ']': #loop within fields
+							if results[index] == '[' or results[index] == '{':
+								folding = []
 								if results[index] == '[':
 									folding.append(']')
-								elif results[index] == '{':
+								else:
 									folding.append('}')
-					if results[index] == ':':
-						middle = index
-					index+=1
-				end = index
-				name = convert_to_type(results[start:middle])
-				data
-				if len(subobjects) == 0:
-					data = convert_to_type(results[middle+1, end])
-				else:
-					i2 = 0
-					data = []
-					while i2 < len(subojects):
-						if i2 == 0:
-							data.append(convert_to_type(results[middle+1:subobjects[i2]]))
+								while len(folding)>0:
+									index+=1
+									if results[index] == folding[-1]:
+										folding.pop(-1)
+									elif len(folding) == 1 and folding[-1] == ']' and results[index] == ',':
+										subobjects.append(index)
+									else:
+										if results[index] == '[':
+											folding.append(']')
+										elif results[index] == '{':
+											folding.append('}')
+							if results[index] == ':':
+								middle = index
+							index+=1
+						end = index
+						name = convert_to_type(results[start:middle])
+						data
+						if len(subobjects) == 0:
+							data = convert_to_type(results[middle+1, end])
 						else:
-							data.append(convert_to_type(results[subobjects[i2-1]+1:subobjects[i2]]))
-						i2+=1
-				t = (name,data)
-				games.append(game(t))
+							i2 = 0
+							data = []
+							while i2 < len(subojects):
+								if i2 == 0:
+									data.append(convert_to_type(results[middle+1:subobjects[i2]]))
+								else:
+									data.append(convert_to_type(results[subobjects[i2-1]+1:subobjects[i2]]))
+								i2+=1
+						t = (name,data)
+						output.append(t)
+						index+=1
+					games.append(tuplelist(output))
+					index+=1
 				index+=1
-			index+=1
 		index+=1
 
 #Should convert information from response into a list of result objects
@@ -146,9 +150,8 @@ def parse(response):
 				t = (name,data)
 				output.append(t)
 				index+=1
-			index+=1
 		index+=1
-	return resultitem(output)
+	return tuplelist(output)
 
 #Entry point into application; downloads and parses API data before starting the web application
 if __name__ == '__main__':

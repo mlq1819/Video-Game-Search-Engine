@@ -1,4 +1,4 @@
-class resultitem(object):
+class tuplelist(object):
     """result object containing a list of fields"""
 
     #takes in a list of tuples[2]
