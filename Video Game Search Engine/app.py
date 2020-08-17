@@ -27,48 +27,49 @@ def result():
 	else:
 		return index()
 
-#takes a list of results and adds games from the list
+#takes a string of results and adds games from the generated list
+#results should be formatted as such: [{"Name":Data,"Name":Data,"Name":Data},{"Name":Data,"Name":Data,"Name":Data},{"Name":Data,"Name":Data,"Name":Data}]
 def add_games(results):
 	start = 0
 	middle = 0
 	subobjects=[]
 	end = 0
 	index = 0
-	response = results.results
-	while index >= 0 and index < len(response):
-		if response[index] == '{':
+	while index >= 0 and index < len(results):
+		if results[index] == '[':
 			index+=1
-			while response[index] != '}':
+			while results[index] != ']':
 				start = index
-				while response[index] != ',':
-					if response[index] == '[':
-						while response[index] != ']':
-							if response[index] == ',':
+				while results[index] != ',':
+					if results[index] == '[':
+						while results[index] != ']':
+							if results[index] == ',':
 								subobjects.append(index)
 							index+=1
-					if response[index] == '{':
-						while response[index] != '}':
+					if results[index] == '{':
+						while results[index] != '}':
 							index+=1
-					if response[index] == ':':
+					if results[index] == ':':
 						middle = index
 					index+=1
-				name = response[start:middle]
+				name = results[start:middle]
 				data
 				if len(subobjects) == 0:
-					data = response[middle+1, end]
+					data = results[middle+1, end]
 				else:
 					i2 = 0
 					data = []
 					while i2 < len(subojects):
 						if i2 == 0:
-							data.append(response[middle+1:subobjects[i2]])
+							data.append(results[middle+1:subobjects[i2]])
 						else:
-							data.append(response[subobjects[i2-1]+1:subobjects[i2]])
+							data.append(results[subobjects[i2-1]+1:subobjects[i2]])
 						i2+=1
 				games.append(game(name, data))
 		index+=1
 
-#Should convert information from response into a result object
+#Should convert information from response into a list of result objects
+#response should be formatted as such: {"Name":Data,"Name":Data,"Name":Data}
 def parse(response):
 	start = 0
 	middle = 0
@@ -108,13 +109,13 @@ if __name__ == '__main__':
 			if offset > 0:
 				url = url + "&offset=" + str(offset)
 			url = url + "&platforms=" + str(platform)
-			#https://www.giantbomb.com/api/games/?api_key=6fe6fb576b0c7bef2364938b2248e1628759508d&format=json&field_list=name,platforms&filter=platforms=21|9|43
+			#https://www.giantbomb.com/api/games/?api_key=6fe6fb576b0c7bef2364938b2248e1628759508d&format=json&platforms=21
 			print(url)
 			response = requests.get(url, headers=headers)
 			results = parse(response)
 			num_results = len(results)
 			if response.status_code == 200 or response.status_code == 301:
-				add_games(results)
+				add_games(results.Get("results"))
 			else:
 				hasnt_failed = False
 				print("Error code " + str(response.status_code))

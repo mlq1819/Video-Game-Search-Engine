@@ -2,6 +2,7 @@ class result(object):
     """result object containing a list of fields"""
     fields = []
 
+    #takes in a list of tuples[2]
     def __init__(self, new_fields):
         self.fields = new_fields
 
