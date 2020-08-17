@@ -92,7 +92,7 @@ def add_games(results):
 									folding.append('\"')
 								elif results[index] == '{':
 									folding.append('}')
-								if found_middle and "description" in results[start:middle]:
+								if index+1 < len(results) and results[index+1] == '<':
 									while len(folding)>0:
 										index+=1
 										if results[index] == folding[-1]:
@@ -162,37 +162,22 @@ def parse(response):
 				if start + 10 < len(response):
 					print("\tAt section starting with \"" + response[start:start+10] + "\"")
 				found_middle = False
-				while response[index] != ',' and (response[index] != '}' or not outside_string): #loop within fields to find middle and end points
-					if response[index] == '[' or response[index] == '{' or (response[index] == '\"' and index==0) or (response[index] == '\"' and response[index-1]!='\''): #folder loop
+				while response[index] != ',' and response[index] != '}': #loop within fields to find middle and end points
+					if response[index] == '[' or response[index] == '{': #folder loop
 						folding = []
 						if response[index] == '[':
 							folding.append(']')
-						elif response[index] == '\"':
-							folding.append('\"')
 						elif response[index] == '{':
 							folding.append('}')
-						if found_middle and "description" in response[start:middle]:
-							while len(folding)>0:
-								index+=1
-								if response[index] == folding[-1]:
-									folding.pop(-1)
-								else:
-									if response[index] == "<":
-										folding.append(">")
-						else:
-							while len(folding)>0:
-								index+=1
-								if index >= len(response):
-									print("oh no")
-								if response[index] == folding[-1]:
-									folding.pop(-1)
-								else:
-									if (response[index] == '\"' and index==0) or (response[index] == '\"' and response[index-1]!='\''):
-										folding.append('\"')
-									elif response[index] == '[':
-										folding.append(']')
-									elif response[index] == '{':
-										folding.append('}')
+						while len(folding)>0:
+							index+=1
+							if response[index] == folding[-1]:
+								folding.pop(-1)
+							else:
+								if response[index] == '[':
+									folding.append(']')
+								elif response[index] == '{':
+									folding.append('}')
 					elif response[index] == ':' and not found_middle:
 						middle = index
 						found_middle = True
