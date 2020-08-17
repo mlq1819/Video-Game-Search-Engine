@@ -1,10 +1,12 @@
 from result import result
+from game import game
 
 parsed = []
 key="6fe6fb576b0c7bef2364938b2248e1628759508d"
 baseUrl="https://www.giantbomb.com/api/"
 resource="games"
 platforms = [21,9,43]
+games = []
 
 import requests
 from flask import Flask, render_template, request
@@ -25,9 +27,53 @@ def result():
 	else:
 		return index()
 
+#takes a list of results and adds games from the list
+def add_games(results):
+	start = 0
+	middle = 0
+	subobjects=[]
+	end = 0
+	index = 0
+	output = []
+	response = results.results
+	while index >= 0 and index < len(response):
+		if response[index] == '{':
+			index+=1
+			while response[index] != '}':
+				start = index
+				while response[index] != ',':
+					if response[index] == '[':
+						while response[index] != ']':
+							if response[index] == ',':
+								subobjects.append(index)
+							index+=1
+					if response[index] == '{':
+						while response[index] != '}':
+							index+=1
+					if response[index] == ':':
+						middle = index
+					index+=1
+				name = response[start:middle]
+				data
+				if len(subobjects) == 0:
+					data = response[middle+1, end]
+				else:
+					i2 = 0
+					data = []
+					while i2 < len(subojects):
+						if i2 == 0:
+							data.append(response[middle+1:subobjects[i2]])
+						else:
+							data.append(response[subobjects[i2-1]+1:subobjects[i2]])
+						i2+=1
+				output.append(game(name, data))
+		index+=1
+	return output
+
 #Should convert information from response into a result object
 def parse(response):
 	start = 0
+	middle = 0
 	end = 0
 	index = 0
 	output = []
@@ -43,8 +89,12 @@ def parse(response):
 					if response[index] == '{':
 						while response[index] != '}':
 							index+=1
+					if response[index] == ':':
+						middle = index
 					index+=1
-				output.append(result(response[start:end]))
+				name = response[start:middle]
+				data = response[middle+1:end]
+				output.append(result(name, data))
 		index+=1
 	return output
 
@@ -62,10 +112,10 @@ if __name__ == '__main__':
 			#https://www.giantbomb.com/api/games/?api_key=6fe6fb576b0c7bef2364938b2248e1628759508d&format=json&field_list=name,platforms&filter=platforms=21|9|43
 			print(url)
 			response = requests.get(url, headers=headers)
-			result = parse(response)
-			num_results = response.number_of_page_results
+			results = parse(response)
+			num_results = len(results)
 			if response.status_code == 200 or response.status_code == 301:
-				parse(response)
+				add_games(results)
 			else:
 				hasnt_failed = False
 				print("Error code " + str(response.status_code))
