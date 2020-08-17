@@ -25,11 +25,28 @@ def result():
 	else:
 		return index()
 
-#Should convert information from response and add to parsed
+#Should convert information from response into a result object
 def parse(response):
-	print("Successfully downloaded data: Code " + response.status_code)
-
-
+	start = 0
+	end = 0
+	index = 0
+	output = []
+	while index >= 0 and index < len(response):
+		if response[index] == '{':
+			index+=1
+			while response[index] != '}':
+				start = index
+				while response[index] != ',':
+					if response[index] == '[':
+						while response[index] != ']':
+							index+=1
+					if response[index] == '{':
+						while response[index] != '}':
+							index+=1
+					index+=1
+				output.append(result(response[start:end]))
+		index+=1
+	return output
 
 if __name__ == '__main__':
 	hasnt_failed = True
@@ -41,11 +58,11 @@ if __name__ == '__main__':
 			url = baseUrl + resource + "/?api_key=" + key + "&format=json"
 			if offset > 0:
 				url = url + "&offset=" + str(offset)
-			if len(platform) > 0:
-				url = url + "&platforms=" + str(platform)
+			url = url + "&platforms=" + str(platform)
 			#https://www.giantbomb.com/api/games/?api_key=6fe6fb576b0c7bef2364938b2248e1628759508d&format=json&field_list=name,platforms&filter=platforms=21|9|43
 			print(url)
 			response = requests.get(url, headers=headers)
+			result = parse(response)
 			num_results = response.number_of_page_results
 			if response.status_code == 200 or response.status_code == 301:
 				parse(response)

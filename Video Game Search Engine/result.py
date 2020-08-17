@@ -10,3 +10,9 @@ class result(object):
             if tuple[0] == field:
                 return tuple[1]
         return None
+
+    def Has(field):
+        for tuple in fields:
+            if tuple[0] == field:
+                return True
+        return False
