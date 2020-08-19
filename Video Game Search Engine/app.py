@@ -78,7 +78,7 @@ def add_games(results):
 						print("\tAt game starting with \"" + results[index:index+25] + "\"")
 					elif index + 10 < len(results):
 						print("\tAt game starting with \"" + results[index:index+10] + "\"")
-					while index < len(results) and results[index] != '}': #loop between fields of game object, within game object; CURRENTLY BROKEN, exits too early
+					while index < len(results) and results[index] != '}': #loop between fields of game object, within game object
 						start = index
 						middle = index
 						end = index
@@ -92,15 +92,16 @@ def add_games(results):
 						elif index < len(results):
 							print("\t\tAt section starting with \"" + results[index] + "\"")
 						while index < len(results) and results[index] != ',' and results[index] != '}': #loop within fields to find middle and end points
-							if results[index] == '[' or results[index] == '{' or results[index] == '\"': #folder loop
+							if results[index] == '[' or results[index] == '{' or results[index] == '\"': #folder check; CURRENTLY BROKEN, somehow backtracks
+								print("\t\t\tOpened fold at index = " + str(index))
 								folding = []
 								if results[index] == '[':
 									folding.append(']')
 								elif results[index] == '\"':
 									folding.append('\"')
 								elif results[index] == '{':
-									folding.append('}')
-								if index+1 < len(results) and results[index+1] == '<':
+									folding.append('}')	
+								if index+1 < len(results) and results[index+1] == '<': #html folding loop
 									while len(folding)>0:
 										index+=1
 										if results[index] == folding[-1]:
@@ -109,7 +110,7 @@ def add_games(results):
 											if results[index] == "<":
 												folding.append(">")
 								else:
-									while len(folding)>0:
+									while len(folding)>0: #main folding loop
 										index+=1
 										if results[index] == folding[-1]:
 											folding.pop(-1)
@@ -122,13 +123,15 @@ def add_games(results):
 												folding.append(']')
 											elif results[index] == '{':
 												folding.append('}')
+								index+=1
+								print("\t\t\tClosed fold at index = " + str(index))
 							elif results[index] == ':' and not found_middle:
 								middle = index
 								found_middle = True
 								print("\t\t\tFound Middle: \"" + results[start:middle] + "\"")
-							index+=1
 						#At end of field; results[index] is either ',' (still in game object) or '}' (end of game object)
 						end = index
+						print("\t\t\tEnd = " + str(end) + ";Index = " + str(index))
 						if found_middle and index < len(results):
 							name = convert_to_type(results[start:middle])
 							if len(subobjects) == 0:
