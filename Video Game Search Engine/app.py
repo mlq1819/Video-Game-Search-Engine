@@ -83,6 +83,7 @@ def add_games(results):
 						end = index
 						found_middle = False
 						subobjects=[]
+						'''
 						if index + 10 < len(results):
 							print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
 						elif index + 6 < len(results):
@@ -91,6 +92,7 @@ def add_games(results):
 							print("\t\tAt section starting with \"" + results[index:index+3] + "\"")
 						elif index < len(results):
 							print("\t\tAt section starting with \"" + results[index] + "\"")
+						'''
 						while index < len(results) and results[index] != ',' and results[index] != '}': #loop within fields to find middle and end points
 							if results[index] == '[' or results[index] == '{' or results[index] == '\"': #folder check; CURRENTLY BROKEN, somehow backtracks
 								#print("\t\t\tOpened fold at index = " + str(index))
@@ -131,14 +133,14 @@ def add_games(results):
 							index+=1
 						#At end of field; results[index] is either ',' (still in game object) or '}' (end of game object)
 						end = index
-						print("\t\t\tStepped indices from " + str(start) + " to " + str(middle) + " to " + str(end))
+						#print("\t\t\tStepped indices from " + str(start) + " to " + str(middle) + " to " + str(end))
 						if found_middle and index < len(results):
 							name = convert_to_type(results[start:middle])
 							if len(subobjects) == 0:
 								data = convert_to_type(results[middle+1:end])
 								t = (name,data)
 								output.append(t)
-								print("\t\t\tFilled field \"" + name + "\" with datum: " + str(data))
+								#print("\t\t\tFilled field \"" + name + "\" with datum: " + str(data))
 							else:
 								i2 = 1
 								data = []
@@ -149,11 +151,13 @@ def add_games(results):
 								data.append(convert_to_type(results[subobjects[-1]+1:end-1]))
 								t = (name,data)
 								output.append(t)
+								'''
 								data_str = "["
 								for datum in data:
 									data_str = data_str + "\n\t\t\t\t" + str(datum)
 								data_str = data_str + "\n\t\t\t]"
 								print("\t\t\tFilled field \"" + name + "\" with data: " + data_str)
+								'''
 						if results[index] == ',':
 							index+=1
 					#At end of game; results[index] == '}'; note: most games will end with a "},{", though one will end with "}]"
