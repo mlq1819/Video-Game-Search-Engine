@@ -108,18 +108,19 @@ def add_games(results):
 										to_fold = results[index]
 										if results[index] == '<':
 											html_start = index
-											while results[index] != '>':
+											while index+1 < len(results) and results[index] != '>':
 												index += 1
 											html_end = index
 											to_fold = results[html_start:html_end+1]
 										if to_fold == folding[-1]:
 											folding.pop(-1)
 										elif to_fold[0] == '<' and len(to_fold) > 1 and to_fold[1] != '\\':
-											to_fold = "<\\/" + to_fold[1:-1]
-											if ' ' in to_fold:
-												to_fold = to_fold[:to_fold.index(' ')]
-											to_fold = to_fold + '>'
-											folding.append(to_fold)
+											expected = "<\\/" + to_fold[1:-1]
+											if ' ' in expected:
+												expected = expected[:expected.index(' ')]
+											expected = expected + '>'
+											if expected != "<\\/img>" and expected != "<\\/area>" and expected != "<\\/base>" and expected != "<\\/br>" and expected != "<\\/col>" and expected != "<\\/command>" and expected != "<\\/embed>" and expected != "<\\/hr>" and expected != "<\\/input>" and expected != "<\\/keygen>" and expected != "<\\/link>" and expected != "<\\/meta>" and expected != "<\\/param>" and expected != "<\\/source>" and expected != "<\\/track>" and expected != "<\\/wbr>":
+												folding.append(expected)
 								else:
 									while len(folding)>0: #main folding loop
 										index+=1
