@@ -115,7 +115,10 @@ def add_games(results):
 										if to_fold == folding[-1]:
 											folding.pop(-1)
 										elif to_fold[0] == '<' and len(to_fold) > 1 and to_fold[1] != '\\':
-											to_fold = "<\\/" + to_fold[1:]
+											to_fold = "<\\/" + to_fold[1:-1]
+											if ' ' in to_fold:
+												to_fold = to_fold[:to_fold.index(' ')]
+											to_fold = to_fold + '>'
 											folding.append(to_fold)
 								else:
 									while len(folding)>0: #main folding loop
