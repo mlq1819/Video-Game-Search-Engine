@@ -123,12 +123,12 @@ def add_games(results):
 												folding.append(']')
 											elif results[index] == '{':
 												folding.append('}')
-								index+=1
 								print("\t\t\tClosed fold at index = " + str(index))
 							elif results[index] == ':' and not found_middle:
 								middle = index
 								found_middle = True
 								print("\t\t\tFound Middle: \"" + results[start:middle] + "\"")
+							index+=1
 						#At end of field; results[index] is either ',' (still in game object) or '}' (end of game object)
 						end = index
 						print("\t\t\tEnd = " + str(end) + ";Index = " + str(index))
