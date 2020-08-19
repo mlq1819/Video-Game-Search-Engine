@@ -59,7 +59,6 @@ def convert_to_type(object):
 def add_games(results):
 	start = 0
 	middle = 0
-	subobjects=[]
 	end = 0
 	index = 0
 	print("Parsing game data...")
@@ -83,6 +82,7 @@ def add_games(results):
 						middle = index
 						end = index
 						found_middle = False
+						subobjects=[]
 						if index + 10 < len(results):
 							print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
 						elif index + 6 < len(results):
@@ -93,7 +93,7 @@ def add_games(results):
 							print("\t\tAt section starting with \"" + results[index] + "\"")
 						while index < len(results) and results[index] != ',' and results[index] != '}': #loop within fields to find middle and end points
 							if results[index] == '[' or results[index] == '{' or results[index] == '\"': #folder check; CURRENTLY BROKEN, somehow backtracks
-								print("\t\t\tOpened fold at index = " + str(index))
+								#print("\t\t\tOpened fold at index = " + str(index))
 								folding = []
 								if results[index] == '[':
 									folding.append(']')
@@ -123,15 +123,15 @@ def add_games(results):
 												folding.append(']')
 											elif results[index] == '{':
 												folding.append('}')
-								print("\t\t\tClosed fold at index = " + str(index))
+								#print("\t\t\tClosed fold at index = " + str(index))
 							elif results[index] == ':' and not found_middle:
 								middle = index
 								found_middle = True
-								print("\t\t\tFound Middle: \"" + results[start:middle] + "\"")
+								#print("\t\t\tFound Middle: \"" + results[start:middle] + "\"")
 							index+=1
 						#At end of field; results[index] is either ',' (still in game object) or '}' (end of game object)
 						end = index
-						print("\t\t\tEnd = " + str(end) + ";Index = " + str(index))
+						print("\t\t\tStepped indices from " + str(start) + " to " + str(middle) + " to " + str(end))
 						if found_middle and index < len(results):
 							name = convert_to_type(results[start:middle])
 							if len(subobjects) == 0:
@@ -167,7 +167,6 @@ def add_games(results):
 							print("Completed parsing of game with alias \"" + (games[-1].Get("aliases"))[0] + "\"")
 					else:
 						print("Completed parsing of game with " + str(games[-1].GetFieldName(0)))
-					print("Stepped indices from " + str(start) + " to " + str(end))
 					while results[index] == '}' or results[index] == ',':
 						index+=1
 				if index < len(results) and results[index] != '{':
