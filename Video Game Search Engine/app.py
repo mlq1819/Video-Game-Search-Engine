@@ -69,6 +69,7 @@ def add_games(results):
 				if results[index] == '{': #found a game object
 					output = []
 					index+=1
+					'''
 					if index + 100 < len(results):
 						print("\tAt game starting with \"" + results[index:index+100] + "\"")
 					elif index + 50 < len(results):
@@ -77,6 +78,7 @@ def add_games(results):
 						print("\tAt game starting with \"" + results[index:index+25] + "\"")
 					elif index + 10 < len(results):
 						print("\tAt game starting with \"" + results[index:index+10] + "\"")
+					'''
 					while index < len(results) and results[index] != '}': #loop between fields of game object, within game object
 						start = index
 						middle = index
@@ -163,14 +165,14 @@ def add_games(results):
 					#At end of game; results[index] == '}'; note: most games will end with a "},{", though one will end with "}]"
 					games.append(tuplelist(output))
 					if games[-1].Has("name") and isinstance(games[-1].Get("name"), str):
-						print("Completed parsing of game with name \"" + (games[-1].Get("name")) + "\"")
+						print("Completed parsing of game with name \"" + (games[-1].Get("name")) + "\" with " + str(len(games[-1].fields)) + " fields")
 					elif games[-1].Has("aliases"):
 						if isinstance(games[-1].Get("aliases"), str):
-							print("Completed parsing of game with alias \"" + (games[-1].Get("aliases")) + "\"")
+							print("Completed parsing of game with alias \"" + (games[-1].Get("aliases")) + "\" with " + str(len(games[-1].fields)) + " fields")
 						else:
-							print("Completed parsing of game with alias \"" + (games[-1].Get("aliases"))[0] + "\"")
+							print("Completed parsing of game with alias \"" + (games[-1].Get("aliases"))[0] + "\" with " + str(len(games[-1].fields)) + " fields")
 					else:
-						print("Completed parsing of game with " + str(games[-1].GetFieldName(0)))
+						print("Completed parsing of game with " + str(games[-1].GetFieldName(0)) + " with " + str(len(games[-1].fields)) + " fields")
 					while results[index] == '}' or results[index] == ',':
 						index+=1
 				if index < len(results) and results[index] != '{':
