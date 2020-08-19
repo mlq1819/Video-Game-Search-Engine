@@ -62,6 +62,7 @@ def add_games(results):
 	end = 0
 	index = 0
 	print("Parsing game data...")
+	toggle_print = False
 	while index >= 0 and index < len(results):
 		if results[index] == '[':
 			index+=1
@@ -69,32 +70,28 @@ def add_games(results):
 				if results[index] == '{': #found a game object
 					output = []
 					index+=1
-					'''
-					if index + 100 < len(results):
-						print("\tAt game starting with \"" + results[index:index+100] + "\"")
-					elif index + 50 < len(results):
-						print("\tAt game starting with \"" + results[index:index+50] + "\"")
-					elif index + 25 < len(results):
-						print("\tAt game starting with \"" + results[index:index+25] + "\"")
-					elif index + 10 < len(results):
-						print("\tAt game starting with \"" + results[index:index+10] + "\"")
-					'''
+					if toggle_print:
+						if index + 50 < len(results):
+							print("\tAt game starting with \"" + results[index:index+50] + "\"")
+						elif index + 25 < len(results):
+							print("\tAt game starting with \"" + results[index:index+25] + "\"")
+						elif index + 10 < len(results):
+							print("\tAt game starting with \"" + results[index:index+10] + "\"")
 					while index < len(results) and results[index] != '}': #loop between fields of game object, within game object
 						start = index
 						middle = index
 						end = index
 						found_middle = False
 						subobjects=[]
-						'''
-						if index + 10 < len(results):
-							print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
-						elif index + 6 < len(results):
-							print("\t\tAt section starting with \"" + results[index:index+6] + "\"")
-						elif index + 3 < len(results):
-							print("\t\tAt section starting with \"" + results[index:index+3] + "\"")
-						elif index < len(results):
-							print("\t\tAt section starting with \"" + results[index] + "\"")
-						'''
+						if toggle_print:
+							if index + 10 < len(results):
+								print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
+							elif index + 6 < len(results):
+								print("\t\tAt section starting with \"" + results[index:index+6] + "\"")
+							elif index + 3 < len(results):
+								print("\t\tAt section starting with \"" + results[index:index+3] + "\"")
+							elif index < len(results):
+								print("\t\tAt section starting with \"" + results[index] + "\"")
 						while index < len(results) and results[index] != ',' and results[index] != '}': #loop within fields to find middle and end points
 							if results[index] == '[' or results[index] == '{' or results[index] == '\"': #folder check; CURRENTLY BROKEN, somehow backtracks
 								#print("\t\t\tOpened fold at index = " + str(index))
@@ -108,11 +105,18 @@ def add_games(results):
 								if index+1 < len(results) and results[index+1] == '<': #html folding loop
 									while len(folding)>0:
 										index+=1
-										if results[index] == folding[-1]:
+										to_fold = results[index]
+										if results[index] == '<':
+											html_start = index
+											while results[index] != '>':
+												index += 1
+											html_end = index
+											to_fold = results[html_start:html_end+1]
+										if to_fold == folding[-1]:
 											folding.pop(-1)
-										else:
-											if results[index] == "<":
-												folding.append(">")
+										elif to_fold[0] == '<' and len(to_fold) > 1 and to_fold[1] != '\\':
+											to_fold = "<\\/" + to_fold[1:]
+											folding.append(to_fold)
 								else:
 									while len(folding)>0: #main folding loop
 										index+=1
@@ -135,14 +139,16 @@ def add_games(results):
 							index+=1
 						#At end of field; results[index] is either ',' (still in game object) or '}' (end of game object)
 						end = index
-						#print("\t\t\tStepped indices from " + str(start) + " to " + str(middle) + " to " + str(end))
+						if toggle_print:
+							print("\t\t\tStepped indices from " + str(start) + " to " + str(middle) + " to " + str(end))
 						if found_middle and index < len(results):
 							name = convert_to_type(results[start:middle])
 							if len(subobjects) == 0:
 								data = convert_to_type(results[middle+1:end])
 								t = (name,data)
 								output.append(t)
-								#print("\t\t\tFilled field \"" + name + "\" with datum: " + str(data))
+								if toggle_print:
+									print("\t\t\tFilled field \"" + name + "\" with datum: " + str(data))
 							else:
 								i2 = 1
 								data = []
@@ -153,19 +159,21 @@ def add_games(results):
 								data.append(convert_to_type(results[subobjects[-1]+1:end-1]))
 								t = (name,data)
 								output.append(t)
-								'''
-								data_str = "["
-								for datum in data:
-									data_str = data_str + "\n\t\t\t\t" + str(datum)
-								data_str = data_str + "\n\t\t\t]"
-								print("\t\t\tFilled field \"" + name + "\" with data: " + data_str)
-								'''
+								if toggle_print:
+									data_str = "["
+									for datum in data:
+										data_str = data_str + "\n\t\t\t\t" + str(datum)
+									data_str = data_str + "\n\t\t\t]"
+									print("\t\t\tFilled field \"" + name + "\" with data: " + data_str)
 						if results[index] == ',':
 							index+=1
 					#At end of game; results[index] == '}'; note: most games will end with a "},{", though one will end with "}]"
 					games.append(tuplelist(output))
+					toggle_print = False
 					if games[-1].Has("name") and isinstance(games[-1].Get("name"), str):
 						print("\tCompleted parsing of game with name \"" + (games[-1].Get("name")) + "\"\t with " + str(len(games[-1].fields)) + " fields")
+						if games[-1].Get("name") == "Faria: A World of Mystery and Danger!":
+							toggle_print = True
 					elif games[-1].Has("aliases"):
 						if isinstance(games[-1].Get("aliases"), str):
 							print("\tCompleted parsing of game with alias \"" + (games[-1].Get("aliases")) + "\"\t with " + str(len(games[-1].fields)) + " fields")
