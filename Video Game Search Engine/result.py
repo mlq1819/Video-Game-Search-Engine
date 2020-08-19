@@ -16,3 +16,8 @@ class tuplelist(object):
             if tuple[0] == field:
                 return True
         return False
+
+    def GetFieldName(self, index):
+        if index < len(self.fields):
+            return self.fields[index][0]
+        return None

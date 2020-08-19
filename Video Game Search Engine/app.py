@@ -86,7 +86,7 @@ def add_games(results):
 						else:
 							print("\tSkipping until index > " + str(len(results) * 0.95))
 						print_skip = False
-					while index < len(results) and results[index] != ',' and results[index] != ']': #loop between fields of game object, within game object
+					while index < len(results) and results[index] != '}': #loop between fields of game object, within game object; CURRENTLY BROKEN, exits too early
 						start = index
 						found_middle = False
 						if index > len(results) - 5000 or index > len(results) * 0.95:
@@ -135,36 +135,42 @@ def add_games(results):
 								if index > len(results) - 5000 or index > len(results) * 0.95:
 									print("\t\t\tFound Middle: \"" + results[start:middle] + "\"")
 							index+=1
-						#At end of field; results[index] is either ',' or '}'
-						if index < len(results):
-							end = index
+						#At end of field; results[index] is either ',' (still in game object) or '}' (end of game object)
+						end = index
+						if found_middle and index < len(results):
 							name = convert_to_type(results[start:middle])
 							if len(subobjects) == 0:
 								data = convert_to_type(results[middle+1:end])
 								t = (name,data)
 								output.append(t)
 							else:
-								i2 = 0
+								i2 = 1
 								data = []
+								data.append(convert_to_type(results[middle+2:subobjects[0]]))
 								while i2 < len(subobjects):
-									if i2 == 0:
-										data.append(convert_to_type(results[middle+1:subobjects[i2]]))
-									else:
-										data.append(convert_to_type(results[subobjects[i2-1]+1:subobjects[i2]]))
+									data.append(convert_to_type(results[subobjects[i2-1]+1:subobjects[i2]]))
 									i2+=1
+								data.append(convert_to_type(results[subobjects[-1]+1:end-1]))
 								t = (name,data)
 								output.append(t)
-						index+=1
-					#At end of game; results[index] == '}'; note: most games will end with a "},{"
+						if results[index] == ',':
+							index+=1
+					#At end of game; results[index] == '}'; note: most games will end with a "},{", though one will end with "}]"
 					games.append(tuplelist(output))
-					if games[-1].Has("aliases"):
-						print("Completed parsing of game with alias \"" + games[-1].Get("aliases") + "\"")
+					if games[-1].Has("name") and isinstance(games[-1].Get("name"), str):
+						print("Completed parsing of game with name \"" + (games[-1].Get("name")) + "\"")
+					elif games[-1].Has("aliases"):
+						if isinstance(games[-1].Get("aliases"), str):
+							print("Completed parsing of game with alias \"" + (games[-1].Get("aliases")) + "\"")
+						else:
+							print("Completed parsing of game with alias \"" + (games[-1].Get("aliases"))[0] + "\"")
 					else:
-						print("Completed parsing of game")
+						print("Completed parsing of game with " + str(games[-1].GetFieldName(0)))
 					while results[index] == '}' or results[index] == ',':
 						index+=1
-				index+=1
-		#Possibly at end of list, results[index] may equal ']'
+				if index < len(results) and results[index] != '{':
+					index+=1
+		#Possibly at end of list, results[index] either equals ']' or is out of range
 		index+=1
 	print("Completed parsing of game data")
 
