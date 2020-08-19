@@ -46,7 +46,7 @@ def is_numeric(str):
 	
 #either removes quotation marks and returns a string, or attempts to convert to an int
 def convert_to_type(object):
-	if len(object)>=2 and object[0] == '"' and object[len(object)-1] == '"':
+	if len(object)>=2 and object[0] == '"' and object[len(object)-1] == '"' and object.count('\"') == 2:
 		return object[1:len(object)-1]
 	else:
 		if is_numeric(object):
@@ -63,7 +63,6 @@ def add_games(results):
 	end = 0
 	index = 0
 	print("Parsing game data...")
-	print_skip = True
 	while index >= 0 and index < len(results):
 		if results[index] == '[':
 			index+=1
@@ -71,33 +70,27 @@ def add_games(results):
 				if results[index] == '{': #found a game object
 					output = []
 					index+=1
-					if index > len(results) - 5000 or index > len(results) * 0.95:
-						if index + 100 < len(results):
-							print("\tAt game starting with \"" + results[index:index+100] + "\"")
-						elif index + 50 < len(results):
-							print("\tAt game starting with \"" + results[index:index+50] + "\"")
-						elif index + 25 < len(results):
-							print("\tAt game starting with \"" + results[index:index+25] + "\"")
-						elif index + 10 < len(results):
-							print("\tAt game starting with \"" + results[index:index+10] + "\"")
-					elif print_skip:
-						if len(results) - 5000 > len(results) * 0.95:
-							print("\tSkipping until index > " + str(len(results) - 5000))
-						else:
-							print("\tSkipping until index > " + str(len(results) * 0.95))
-						print_skip = False
+					if index + 100 < len(results):
+						print("\tAt game starting with \"" + results[index:index+100] + "\"")
+					elif index + 50 < len(results):
+						print("\tAt game starting with \"" + results[index:index+50] + "\"")
+					elif index + 25 < len(results):
+						print("\tAt game starting with \"" + results[index:index+25] + "\"")
+					elif index + 10 < len(results):
+						print("\tAt game starting with \"" + results[index:index+10] + "\"")
 					while index < len(results) and results[index] != '}': #loop between fields of game object, within game object; CURRENTLY BROKEN, exits too early
 						start = index
+						middle = index
+						end = index
 						found_middle = False
-						if index > len(results) - 5000 or index > len(results) * 0.95:
-							if index + 10 < len(results):
-								print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
-							elif index + 6 < len(results):
-								print("\t\tAt section starting with \"" + results[index:index+6] + "\"")
-							elif index + 3 < len(results):
-								print("\t\tAt section starting with \"" + results[index:index+3] + "\"")
-							elif index < len(results):
-								print("\t\tAt section starting with \"" + results[index] + "\"")
+						if index + 10 < len(results):
+							print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
+						elif index + 6 < len(results):
+							print("\t\tAt section starting with \"" + results[index:index+6] + "\"")
+						elif index + 3 < len(results):
+							print("\t\tAt section starting with \"" + results[index:index+3] + "\"")
+						elif index < len(results):
+							print("\t\tAt section starting with \"" + results[index] + "\"")
 						while index < len(results) and results[index] != ',' and results[index] != '}': #loop within fields to find middle and end points
 							if results[index] == '[' or results[index] == '{' or results[index] == '\"': #folder loop
 								folding = []
@@ -120,7 +113,7 @@ def add_games(results):
 										index+=1
 										if results[index] == folding[-1]:
 											folding.pop(-1)
-										elif len(folding) == 1 and folding[-1] == ']' and results[index] == ',':
+										elif len(folding) == 1 and (folding[-1] == ']' or folding[-1] == '}') and results[index] == ',':
 											subobjects.append(index)
 										else:
 											if (results[index] == '\"' and index==0) or (results[index] == '\"' and results[index-1]!='\''):
@@ -132,8 +125,7 @@ def add_games(results):
 							elif results[index] == ':' and not found_middle:
 								middle = index
 								found_middle = True
-								if index > len(results) - 5000 or index > len(results) * 0.95:
-									print("\t\t\tFound Middle: \"" + results[start:middle] + "\"")
+								print("\t\t\tFound Middle: \"" + results[start:middle] + "\"")
 							index+=1
 						#At end of field; results[index] is either ',' (still in game object) or '}' (end of game object)
 						end = index
@@ -143,6 +135,7 @@ def add_games(results):
 								data = convert_to_type(results[middle+1:end])
 								t = (name,data)
 								output.append(t)
+								print("\t\t\tFilled field \"" + name + "\" with datum: " + str(data))
 							else:
 								i2 = 1
 								data = []
@@ -153,6 +146,11 @@ def add_games(results):
 								data.append(convert_to_type(results[subobjects[-1]+1:end-1]))
 								t = (name,data)
 								output.append(t)
+								data_str = "["
+								for datum in data:
+									data_str = data_str + "\n\t\t\t\t" + str(datum)
+								data_str = data_str + "\n\t\t\t]"
+								print("\t\t\tFilled field \"" + name + "\" with data: " + data_str)
 						if results[index] == ',':
 							index+=1
 					#At end of game; results[index] == '}'; note: most games will end with a "},{", though one will end with "}]"
@@ -166,6 +164,7 @@ def add_games(results):
 							print("Completed parsing of game with alias \"" + (games[-1].Get("aliases"))[0] + "\"")
 					else:
 						print("Completed parsing of game with " + str(games[-1].GetFieldName(0)))
+					print("Stepped indices from " + str(start) + " to " + str(end))
 					while results[index] == '}' or results[index] == ',':
 						index+=1
 				if index < len(results) and results[index] != '{':
