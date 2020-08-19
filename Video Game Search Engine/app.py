@@ -63,6 +63,7 @@ def add_games(results):
 	end = 0
 	index = 0
 	print("Parsing game data...")
+	print_skip = True
 	while index >= 0 and index < len(results):
 		if results[index] == '[':
 			index+=1
@@ -70,21 +71,35 @@ def add_games(results):
 				if results[index] == '{': #found a game object
 					output = []
 					index+=1
-					if index + 100 < len(results):
-						print("\tAt game starting with \"" + results[index:index+100] + "\"")
-					elif index + 50 < len(results):
-						print("\tAt game starting with \"" + results[index:index+50] + "\"")
-					elif index + 25 < len(results):
-						print("\tAt game starting with \"" + results[index:index+25] + "\"")
-					elif index + 10 < len(results):
-						print("\tAt game starting with \"" + results[index:index+10] + "\"")
-					while index < len(results) and results[index] != ',': #loop between fields of game object, within game object
+					if index > len(results) - 5000 or index > len(results) * 0.95:
+						if index + 100 < len(results):
+							print("\tAt game starting with \"" + results[index:index+100] + "\"")
+						elif index + 50 < len(results):
+							print("\tAt game starting with \"" + results[index:index+50] + "\"")
+						elif index + 25 < len(results):
+							print("\tAt game starting with \"" + results[index:index+25] + "\"")
+						elif index + 10 < len(results):
+							print("\tAt game starting with \"" + results[index:index+10] + "\"")
+					elif print_skip:
+						if len(results) - 5000 > len(results) * 0.95:
+							print("\tSkipping until index > " + str(len(results) - 5000))
+						else:
+							print("\tSkipping until index > " + str(len(results) * 0.95))
+						print_skip = False
+					while index < len(results) and results[index] != ',' and results[index] != ']': #loop between fields of game object, within game object
 						start = index
 						found_middle = False
-						if index + 10 < len(results):
-							print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
-						while results[index] != ',' and results[index] != '}': #loop within fields to find middle and end points
-							if results[index] == '[' or results[index] == '{' or (results[index] == '\"' and index==0) or (results[index] == '\"' and results[index-1]!='\''): #folder loop
+						if index > len(results) - 5000 or index > len(results) * 0.95:
+							if index + 10 < len(results):
+								print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
+							elif index + 6 < len(results):
+								print("\t\tAt section starting with \"" + results[index:index+6] + "\"")
+							elif index + 3 < len(results):
+								print("\t\tAt section starting with \"" + results[index:index+3] + "\"")
+							elif index < len(results):
+								print("\t\tAt section starting with \"" + results[index] + "\"")
+						while index < len(results) and results[index] != ',' and results[index] != '}': #loop within fields to find middle and end points
+							if results[index] == '[' or results[index] == '{' or results[index] == '\"': #folder loop
 								folding = []
 								if results[index] == '[':
 									folding.append(']')
@@ -117,29 +132,35 @@ def add_games(results):
 							elif results[index] == ':' and not found_middle:
 								middle = index
 								found_middle = True
+								if index > len(results) - 5000 or index > len(results) * 0.95:
+									print("\t\t\tFound Middle: \"" + results[start:middle] + "\"")
 							index+=1
 						#At end of field; results[index] is either ',' or '}'
-						end = index
-						name = convert_to_type(results[start:middle])
-						if len(subobjects) == 0:
-							data = convert_to_type(results[middle+1:end])
-							t = (name,data)
-							output.append(t)
-						else:
-							i2 = 0
-							data = []
-							while i2 < len(subobjects):
-								if i2 == 0:
-									data.append(convert_to_type(results[middle+1:subobjects[i2]]))
-								else:
-									data.append(convert_to_type(results[subobjects[i2-1]+1:subobjects[i2]]))
-								i2+=1
-							t = (name,data)
-							output.append(t)
+						if index < len(results):
+							end = index
+							name = convert_to_type(results[start:middle])
+							if len(subobjects) == 0:
+								data = convert_to_type(results[middle+1:end])
+								t = (name,data)
+								output.append(t)
+							else:
+								i2 = 0
+								data = []
+								while i2 < len(subobjects):
+									if i2 == 0:
+										data.append(convert_to_type(results[middle+1:subobjects[i2]]))
+									else:
+										data.append(convert_to_type(results[subobjects[i2-1]+1:subobjects[i2]]))
+									i2+=1
+								t = (name,data)
+								output.append(t)
 						index+=1
 					#At end of game; results[index] == '}'; note: most games will end with a "},{"
 					games.append(tuplelist(output))
-					print("Completed parsing of game")
+					if games[-1].Has("aliases"):
+						print("Completed parsing of game with alias \"" + games[-1].Get("aliases") + "\"")
+					else:
+						print("Completed parsing of game")
 					while results[index] == '}' or results[index] == ',':
 						index+=1
 				index+=1
@@ -159,7 +180,7 @@ def parse(response):
 	while index >= 0 and index < len(response):
 		if response[index] == '{':
 			index+=1
-			while index < len(response) and response[index] != '}':
+			while index < len(response) and response[index] != '}' and response[index] != ']':
 				start = index
 				if start + 10 < len(response):
 					print("\tAt section starting with \"" + response[start:start+10] + "\"")
@@ -198,6 +219,7 @@ def parse(response):
 if __name__ == '__main__':
 	hasnt_failed = True
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # This is chrome, you can set whatever browser you like
+	batch_number = 1
 	for platform in platforms:
 		num_results = max_elements
 		offset = 0
@@ -212,7 +234,10 @@ if __name__ == '__main__':
 				print(resource + " : platform " + str(platform) + " : offset " + str(offset))
 			else:
 				print(resource + " : platform " + str(platform))
+			print("Retrieving data batch " + str(batch_number) + " from API...")
 			response = requests.get(url, headers=headers)
+			print("... Retrieved data batch " + str(batch_number) + " from API")
+			batch_number += 1
 			results = parse(response.text)
 			num_results = results.Get("number_of_page_results")
 			if response.status_code == 200 or response.status_code == 301:
