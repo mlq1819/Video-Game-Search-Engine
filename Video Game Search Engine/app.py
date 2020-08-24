@@ -218,9 +218,13 @@ if __name__ == '__main__':
 	hasnt_failed = True
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # This is chrome, you can set whatever browser you like
 	batch_number = 1
+	print("Requires batches for " + str(len(platforms)) + " platforms:")
+	for platform in platforms:
+		print("\t> " + str(platform))
 	for platform in platforms:
 		num_results = max_elements
 		offset = 0
+		base_batch_number = batch_number
 		while(num_results == max_elements):
 			url = baseUrl + resource + "/?api_key=" + key + "&format=json"
 			if offset > 0:
@@ -237,6 +241,10 @@ if __name__ == '__main__':
 			print("... Retrieved data batch " + str(batch_number) + " from API")
 			batch_number += 1
 			results = parse(response.text)
+			if offset == 0:
+				expected_batches = results.Get("number_of_total_results")
+				expected_batches = round(expected_batches / max_elements + 0.4999, 0)
+				print("Expecting " + str(expected_batches) + " batches for platform " + str(platform))
 			num_results = results.Get("number_of_page_results")
 			if response.status_code == 200 or response.status_code == 301:
 				add_games(results.Get("results"))
