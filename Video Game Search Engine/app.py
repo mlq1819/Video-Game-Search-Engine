@@ -219,15 +219,25 @@ if __name__ == '__main__':
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # This is chrome, you can set whatever browser you like
 	batch_number = 0
 	print("Requires batches for " + str(len(platforms)) + " platforms:")
+	plat_num = 0
 	for platform in platforms:
 		print("\t> " + str(platform))
 	for platform in platforms:
+		plat_num += 1
 		num_results = max_elements
 		offset = 0
 		base_batch_number = batch_number
 		expected_batches = -1
 		while(num_results == max_elements):
+			base_percent = (plat_num - 1) / len(platforms)
+			extra_percent
+			if offset > 0 and expected_batches > 0:
+				extra_percent = ((batch_number - base_batch_number) / expected_batches) / len(platforms)
+			else:
+				extra_percent = 0
+			final_percent = round((base_percent + extra_percent) * 100, 2)
 			batch_number += 1
+			print(str(final_percent) + "% Completed")
 			url = baseUrl + resource + "/?api_key=" + key + "&format=json"
 			if offset > 0:
 				url = url + "&offset=" + str(offset)
