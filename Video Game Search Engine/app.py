@@ -115,12 +115,13 @@ def add_games(results):
 										if to_fold == folding[-1]:
 											folding.pop(-1)
 										elif to_fold[0] == '<' and len(to_fold) > 1 and to_fold[1] != '\\':
-											expected = "<\\/" + to_fold[1:-1]
-											if ' ' in expected:
-												expected = expected[:expected.index(' ')]
-											expected = expected + '>'
-											if expected != "<\\/img>" and expected != "<\\/area>" and expected != "<\\/base>" and expected != "<\\/br>" and expected != "<\\/col>" and expected != "<\\/command>" and expected != "<\\/embed>" and expected != "<\\/hr>" and expected != "<\\/input>" and expected != "<\\/keygen>" and expected != "<\\/link>" and expected != "<\\/meta>" and expected != "<\\/param>" and expected != "<\\/source>" and expected != "<\\/track>" and expected != "<\\/wbr>":
-												folding.append(expected)
+											if to_fold[-3:-1] != "\\/":
+												expected = "<\\/" + to_fold[1:-1]
+												if ' ' in expected:
+													expected = expected[:expected.index(' ')]
+												expected = expected + '>'
+												if expected != "<\\/img>" and expected != "<\\/area>" and expected != "<\\/base>" and expected != "<\\/br>" and expected != "<\\/col>" and expected != "<\\/command>" and expected != "<\\/embed>" and expected != "<\\/hr>" and expected != "<\\/input>" and expected != "<\\/keygen>" and expected != "<\\/link>" and expected != "<\\/meta>" and expected != "<\\/param>" and expected != "<\\/source>" and expected != "<\\/track>" and expected != "<\\/wbr>":
+													folding.append(expected)
 								else:
 									while len(folding)>0: #main folding loop
 										index+=1
