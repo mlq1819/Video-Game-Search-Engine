@@ -145,7 +145,7 @@ def add_games(results):
 					#At end of game; results[index] == '}'; note: most games will end with a "},{", though one will end with "}]"
 					games.append(tuplelist(output))
 					if games[-1].Has("name") and isinstance(games[-1].Get("name"), str):
-						num_tabs = Min(1, 6 - (int) (len(games[-1].Get("name")) / 4))
+						num_tabs = min(1, 6 - (int) (len(games[-1].Get("name")) / 4))
 						tabs = ""
 						while num_tabs > 0:
 							tabs = tabs + '\t'
