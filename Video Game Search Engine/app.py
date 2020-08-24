@@ -225,6 +225,7 @@ if __name__ == '__main__':
 		num_results = max_elements
 		offset = 0
 		base_batch_number = batch_number
+		expected_batches = -1
 		while(num_results == max_elements):
 			url = baseUrl + resource + "/?api_key=" + key + "&format=json"
 			if offset > 0:
@@ -236,7 +237,10 @@ if __name__ == '__main__':
 				print(resource + " : platform " + str(platform) + " : offset " + str(offset))
 			else:
 				print(resource + " : platform " + str(platform))
-			print("Retrieving data batch " + str(batch_number) + " from API...")
+			if offset > 0 and expected_batches > 0:
+				print("Retrieving data batch " + str(batch_number) + " of " + str(expected_batches + base_batch_number) + " from API...")
+			else:
+				print("Retrieving data batch " + str(batch_number) + " from API...")
 			response = requests.get(url, headers=headers)
 			print("... Retrieved data batch " + str(batch_number) + " from API")
 			batch_number += 1
