@@ -317,8 +317,8 @@ def parse(response):
 						while response[middle] != ':':
 							middle+=1
 						found_middle = True
-						index = len(response)-2
-						while response[index] != '}' or response[index+1] != ']':
+						index = len(response)-3
+						while response[index+1] != '}' or response[index+2] != ']':
 							index-=1
 					else:
 						if response[index] == '[' or response[index] == '{': #folder loop
