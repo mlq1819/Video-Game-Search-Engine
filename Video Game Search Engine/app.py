@@ -61,6 +61,7 @@ def add_games(results):
 	middle = 0
 	end = 0
 	index = 0
+	at_bad = False
 	print("Parsing game data...")
 	while index >= 0 and index < len(results):
 		if results[index] == '[':
@@ -151,6 +152,8 @@ def add_games(results):
 							spaces = spaces + ' '
 							num_spaces -= 1
 						print("\tCompleted parsing of game with name \t\"" + (games[-1].Get("name")) + "\"" + spaces + " with " + str(len(games[-1].fields)) + " fields")
+						if games[-1].Get("name") == "A Week of Garfield":
+							at_bad = True
 					elif games[-1].Has("aliases"):
 						if isinstance(games[-1].Get("aliases"), str):
 							print("\tCompleted parsing of game with alias \"" + (games[-1].Get("aliases")) + "\"\t with " + str(len(games[-1].fields)) + " fields")
