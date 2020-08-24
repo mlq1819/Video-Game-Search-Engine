@@ -312,14 +312,16 @@ def parse(response):
 					print("\tAt section starting with \"" + response[start:start+10] + "\"")
 				found_middle = False
 				while response[index] != ',' and response[index] != '}': #loop within fields to find middle and end points
-					if start+10 < len(response) and response[start:start+10]=="\"results\":":
-						middle = start
-						while response[middle] != ':':
-							middle+=1
+					if start+10 < len(response) and response[start:start+10]=="\"results\":": #results is difficult to parse and very long, so we parse it differently
+						index = start
+						while response[index] != ':':
+							index+=1
+						middle=index
 						found_middle = True
-						index = len(response)-3
-						while response[index+1] != '}' or response[index+2] != ']':
+						index = len(response)-1
+						while response[index-2] != '}' or response[index-1] != ']' or response[index] != ',':
 							index-=1
+						continue
 					else:
 						if response[index] == '[' or response[index] == '{': #folder loop
 							folding = []
