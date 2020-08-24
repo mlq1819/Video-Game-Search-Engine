@@ -58,10 +58,13 @@ def convert_to_type(object):
 
 #Either adds a new data field to expected_fields, or increments the element sharing the same name
 def add_data_field(name):
-	for datum in expected_fields:
+	i = 0
+	while i < len(expected_fields):
+		datum = expected_fields[i]
 		if datum[0] == name:
-			datum[1] += 1
+			expected_fields[i] = (datum[0], datum[1]+1)
 			return
+		i += 1
 	t = (name, 1)
 	expected_fields.append(t)
 	return
