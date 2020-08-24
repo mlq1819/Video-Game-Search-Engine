@@ -12,6 +12,7 @@ expected_fields = []
 force_start = True
 force_platform = 9
 force_offset = 700
+parse_blocks = []
 
 import requests
 from flask import Flask, render_template, request
@@ -277,19 +278,27 @@ def parse(response):
 				while response[index] != ',' and response[index] != '}': #loop within fields to find middle and end points
 					if response[index] == '[' or response[index] == '{': #folder loop
 						folding = []
+						folding_indices = []
+						folding_blocks = []
 						if response[index] == '[':
 							folding.append(']')
 						elif response[index] == '{':
 							folding.append('}')
+						folding_indices.append(index)
 						while len(folding)>0:
 							index+=1
 							if response[index] == folding[-1]:
 								folding.pop(-1)
+								if force_start:
+									folding_blocks.append(response[folding_indices[-1]:index+1])
+								folding_indices.pop(-1)
 							else:
 								if response[index] == '[':
 									folding.append(']')
+									folding.append(index)
 								elif response[index] == '{':
 									folding.append('}')
+									folding.append(index)
 					elif response[index] == ':' and not found_middle:
 						middle = index
 						found_middle = True
