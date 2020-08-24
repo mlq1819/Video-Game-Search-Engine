@@ -319,8 +319,9 @@ def parse(response):
 						middle=index
 						found_middle = True
 						index = len(response)-1
-						while response[index-2] != '}' or response[index-1] != ']' or response[index] != ',':
+						while response[index-2] != '}' or response[index-1] != ']' or (response[index] != ',' and response[index] != '}'):
 							index-=1
+						print("Found possible end of results; is followed by \"" + response[index:] + "\"")
 						continue
 					else:
 						if response[index] == '[' or response[index] == '{': #folder loop
