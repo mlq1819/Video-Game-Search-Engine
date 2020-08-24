@@ -230,11 +230,9 @@ if __name__ == '__main__':
 		expected_batches = -1
 		while(num_results == max_elements):
 			base_percent = (plat_num - 1) / len(platforms)
-			extra_percent
+			extra_percent = 0.0
 			if offset > 0 and expected_batches > 0:
 				extra_percent = ((batch_number - base_batch_number) / expected_batches) / len(platforms)
-			else:
-				extra_percent = 0
 			final_percent = round((base_percent + extra_percent) * 100, 2)
 			batch_number += 1
 			print(str(final_percent) + "% Completed")
