@@ -279,7 +279,9 @@ def parse(response):
 					if response[index] == '[' or response[index] == '{': #folder loop
 						folding = []
 						folding_indices = []
-						folding_blocks = []
+						folding_blocks = [] #list of block tuples on the current level
+						saved_lists = [] #list of lists of block tuples
+						root = ("",[])
 						if response[index] == '[':
 							folding.append(']')
 						elif response[index] == '{':
@@ -290,15 +292,26 @@ def parse(response):
 							if response[index] == folding[-1]:
 								folding.pop(-1)
 								if force_start:
-									folding_blocks.append(response[folding_indices[-1]:index+1])
+									current = (response[folding_indices[-1]:index+1], folding_blocks)
+									folding_blocks = []
+									if len(saved_lists) > 1:
+										folding_blocks = saved_lists[-1]
+										saved_lists.pop(-1)
+										folding_blocks.append(current)
+									else:
+										root = current
 								folding_indices.pop(-1)
 							else:
 								if response[index] == '[':
 									folding.append(']')
-									folding.append(index)
+									folding_indices.append(index)
+									saved_lists.append(folding_blocks)
+									folding_blocks = []
 								elif response[index] == '{':
 									folding.append('}')
-									folding.append(index)
+									folding_indices.append(index)
+									saved_lists.append(folding_blocks)
+									folding_blocks = []
 					elif response[index] == ':' and not found_middle:
 						middle = index
 						found_middle = True
