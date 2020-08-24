@@ -62,7 +62,6 @@ def add_games(results):
 	end = 0
 	index = 0
 	print("Parsing game data...")
-	toggle_print = False
 	while index >= 0 and index < len(results):
 		if results[index] == '[':
 			index+=1
@@ -70,31 +69,14 @@ def add_games(results):
 				if results[index] == '{': #found a game object
 					output = []
 					index+=1
-					if toggle_print:
-						if index + 50 < len(results):
-							print("\tAt game starting with \"" + results[index:index+50] + "\"")
-						elif index + 25 < len(results):
-							print("\tAt game starting with \"" + results[index:index+25] + "\"")
-						elif index + 10 < len(results):
-							print("\tAt game starting with \"" + results[index:index+10] + "\"")
 					while index < len(results) and results[index] != '}': #loop between fields of game object, within game object
 						start = index
 						middle = index
 						end = index
 						found_middle = False
 						subobjects=[]
-						if toggle_print:
-							if index + 10 < len(results):
-								print("\t\tAt section starting with \"" + results[index:index+10] + "\"")
-							elif index + 6 < len(results):
-								print("\t\tAt section starting with \"" + results[index:index+6] + "\"")
-							elif index + 3 < len(results):
-								print("\t\tAt section starting with \"" + results[index:index+3] + "\"")
-							elif index < len(results):
-								print("\t\tAt section starting with \"" + results[index] + "\"")
 						while index < len(results) and results[index] != ',' and results[index] != '}': #loop within fields to find middle and end points
-							if results[index] == '[' or results[index] == '{' or results[index] == '\"': #folder check; CURRENTLY BROKEN, somehow backtracks
-								#print("\t\t\tOpened fold at index = " + str(index))
+							if results[index] == '[' or results[index] == '{' or results[index] == '\"': #folder check
 								folding = []
 								if results[index] == '[':
 									folding.append(']')
@@ -136,24 +118,18 @@ def add_games(results):
 												folding.append(']')
 											elif results[index] == '{':
 												folding.append('}')
-								#print("\t\t\tClosed fold at index = " + str(index))
 							elif results[index] == ':' and not found_middle:
 								middle = index
 								found_middle = True
-								#print("\t\t\tFound Middle: \"" + results[start:middle] + "\"")
 							index+=1
 						#At end of field; results[index] is either ',' (still in game object) or '}' (end of game object)
 						end = index
-						if toggle_print:
-							print("\t\t\tStepped indices from " + str(start) + " to " + str(middle) + " to " + str(end))
 						if found_middle and index < len(results):
 							name = convert_to_type(results[start:middle])
 							if len(subobjects) == 0:
 								data = convert_to_type(results[middle+1:end])
 								t = (name,data)
 								output.append(t)
-								if toggle_print:
-									print("\t\t\tFilled field \"" + name + "\" with datum: " + str(data))
 							else:
 								i2 = 1
 								data = []
@@ -164,21 +140,17 @@ def add_games(results):
 								data.append(convert_to_type(results[subobjects[-1]+1:end-1]))
 								t = (name,data)
 								output.append(t)
-								if toggle_print:
-									data_str = "["
-									for datum in data:
-										data_str = data_str + "\n\t\t\t\t" + str(datum)
-									data_str = data_str + "\n\t\t\t]"
-									print("\t\t\tFilled field \"" + name + "\" with data: " + data_str)
 						if results[index] == ',':
 							index+=1
 					#At end of game; results[index] == '}'; note: most games will end with a "},{", though one will end with "}]"
 					games.append(tuplelist(output))
-					toggle_print = False
 					if games[-1].Has("name") and isinstance(games[-1].Get("name"), str):
-						print("\tCompleted parsing of game with name \"" + (games[-1].Get("name")) + "\"\t with " + str(len(games[-1].fields)) + " fields")
-						#if games[-1].Get("name") == "Faria: A World of Mystery and Danger!":
-						#	toggle_print = True
+						num_tabs = Min(1, 6 - (int) (len(games[-1].Get("name")) / 4))
+						tabs = ""
+						while num_tabs > 0:
+							tabs = tabs + '\t'
+							num_tabs -= 1
+						print("\tCompleted parsing of game with name \"" + (games[-1].Get("name")) + "\"" + tabs + " with " + str(len(games[-1].fields)) + " fields")
 					elif games[-1].Has("aliases"):
 						if isinstance(games[-1].Get("aliases"), str):
 							print("\tCompleted parsing of game with alias \"" + (games[-1].Get("aliases")) + "\"\t with " + str(len(games[-1].fields)) + " fields")
