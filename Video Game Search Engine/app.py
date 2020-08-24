@@ -92,11 +92,8 @@ def common_field(name):
 #Gets a list of the common fields as tuples with the second index set to False
 def common_fields_list():
 	unsorted = []
-	count = 0
 	for datum in expected_fields:
 		unsorted.append((datum[0],datum[1]))
-		if datum[0] == name:
-			count = datum[1]
 	sorted = []
 	while len(unsorted) > 0:
 		max = 0
