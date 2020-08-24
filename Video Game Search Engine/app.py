@@ -279,7 +279,16 @@ def recurse_tuple1(tuple, depth):
 		output += tab_string
 		max_len = 128
 		if len(tuple[0]) >= max_len:
-			output += "~len=" + str(len(tuple[0])) + "~ " + tuple[0][:max_len]
+			output += "~len=" + str(len(tuple[0]))
+			if tuple[0].count('[') > 0:
+				output += " count(\'[\')=" + str(tuple[0].count('['))
+			if tuple[0].count(']') > 0:
+				output += " count(\']\')=" + str(tuple[0].count(']'))
+			if tuple[0].count('{') > 0:
+				output += " count(\'{\')=" + str(tuple[0].count('{'))
+			if tuple[0].count('}') > 0:
+				output += " count(\'}\')=" + str(tuple[0].count('}'))
+			output += "~ " + tuple[0][:max_len]
 		else:
 			output += tuple[0]
 		output += '\n'
@@ -303,51 +312,33 @@ def parse(response):
 					print("\tAt section starting with \"" + response[start:start+10] + "\"")
 				found_middle = False
 				while response[index] != ',' and response[index] != '}': #loop within fields to find middle and end points
-					if response[index] == '[' or response[index] == '{': #folder loop
-						folding = []
-						folding_indices = []
-						folding_blocks = [] #list of block tuples on the current level
-						saved_lists = [] #list of lists of block tuples
-						root = ("",[])
-						if response[index] == '[':
-							folding.append(']')
-						elif response[index] == '{':
-							folding.append('}')
-						folding_indices.append(index)
-						while len(folding)>0:
-							index+=1
-							temp = ""
-							if force_start and len(response) == index + 1:
-								for block in folding_blocks:
-									temp = temp + recurse_tuple1(block, 0)
-								print(temp)
-								break
-							if response[index] == folding[-1]:
-								folding.pop(-1)
-								if force_start:
-									current = (response[folding_indices[-1]:index+1], folding_blocks)
-									folding_blocks = []
-									if len(saved_lists) > 1:
-										folding_blocks = saved_lists[-1]
-										saved_lists.pop(-1)
-										folding_blocks.append(current)
-									else:
-										root = current
-								folding_indices.pop(-1)
-							else:
-								if response[index] == '[':
-									folding.append(']')
-									folding_indices.append(index)
-									saved_lists.append(folding_blocks)
-									folding_blocks = []
-								elif response[index] == '{':
-									folding.append('}')
-									folding_indices.append(index)
-									saved_lists.append(folding_blocks)
-									folding_blocks = []
-					elif response[index] == ':' and not found_middle:
-						middle = index
+					if start+10 < len(response) and response[start:start+10]=="\"results\":":
+						middle = start
+						while response[middle] != ':':
+							middle+=1
 						found_middle = True
+						index = len(response)-2
+						while response[index] != '}' or response[index+1] != ']':
+							index-=1
+					else:
+						if response[index] == '[' or response[index] == '{': #folder loop
+							folding = []
+							if response[index] == '[':
+								folding.append(']')
+							elif response[index] == '{':
+								folding.append('}')
+							while len(folding)>0:
+								index+=1
+								if response[index] == folding[-1]:
+									folding.pop(-1)
+								else:
+									if response[index] == '[':
+										folding.append(']')
+									elif response[index] == '{':
+										folding.append('}')
+						elif response[index] == ':' and not found_middle:
+							middle = index
+							found_middle = True
 					index+=1
 				end = index
 				name = convert_to_type(response[start:middle])
