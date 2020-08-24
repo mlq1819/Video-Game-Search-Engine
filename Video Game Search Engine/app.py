@@ -113,11 +113,14 @@ def common_fields_list():
 
 #checks whether the data has not been added to the fields_list yet, and that if it is added, that it has not been marked True
 def check_fields_list(list, name):
-	for datum in list:
+	i = 0
+	while i < len(list):
+		datum = list[i]
 		if datum[0] == name:
 			output = datum[1] == False
-			datum[1] = True
+			list[i] = (datum[0], True)
 			return output
+		i += 1
 	list.append((name, True))
 	return True
 
