@@ -145,12 +145,12 @@ def add_games(results):
 					#At end of game; results[index] == '}'; note: most games will end with a "},{", though one will end with "}]"
 					games.append(tuplelist(output))
 					if games[-1].Has("name") and isinstance(games[-1].Get("name"), str):
-						num_tabs = min(1, 6 - (int) (len(games[-1].Get("name")) / 4))
-						tabs = ""
-						while num_tabs > 0:
-							tabs = tabs + '\t'
-							num_tabs -= 1
-						print("\tCompleted parsing of game with name \"" + (games[-1].Get("name")) + "\"" + tabs + " with " + str(len(games[-1].fields)) + " fields")
+						num_spaces = max(1, 64 - len(games[-1].Get("name")))
+						spaces = ""
+						while num_spaces > 0:
+							spaces = spaces + ' '
+							num_spaces -= 1
+						print("\tCompleted parsing of game with name \t\"" + (games[-1].Get("name")) + "\"" + spaces + " with " + str(len(games[-1].fields)) + " fields")
 					elif games[-1].Has("aliases"):
 						if isinstance(games[-1].Get("aliases"), str):
 							print("\tCompleted parsing of game with alias \"" + (games[-1].Get("aliases")) + "\"\t with " + str(len(games[-1].fields)) + " fields")
