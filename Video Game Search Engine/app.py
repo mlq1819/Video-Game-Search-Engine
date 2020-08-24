@@ -247,7 +247,7 @@ if __name__ == '__main__':
 			else:
 				print(resource + " : platform " + str(platform))
 			if offset > 0 and expected_batches > 0:
-				print("Retrieving data batch " + str(batch_number) + " of %d from API...", int(expected_batches + base_batch_number))
+				print("Retrieving data batch " + str(batch_number) + " of " + str(int(expected_batches + base_batch_number)) + " from API...", )
 			else:
 				print("Retrieving data batch " + str(batch_number) + " from API...")
 			response = requests.get(url, headers=headers)
