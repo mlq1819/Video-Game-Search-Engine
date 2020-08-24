@@ -217,7 +217,7 @@ def parse(response):
 if __name__ == '__main__':
 	hasnt_failed = True
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # This is chrome, you can set whatever browser you like
-	batch_number = 1
+	batch_number = 0
 	print("Requires batches for " + str(len(platforms)) + " platforms:")
 	for platform in platforms:
 		print("\t> " + str(platform))
@@ -227,6 +227,7 @@ if __name__ == '__main__':
 		base_batch_number = batch_number
 		expected_batches = -1
 		while(num_results == max_elements):
+			batch_number += 1
 			url = baseUrl + resource + "/?api_key=" + key + "&format=json"
 			if offset > 0:
 				url = url + "&offset=" + str(offset)
@@ -238,12 +239,11 @@ if __name__ == '__main__':
 			else:
 				print(resource + " : platform " + str(platform))
 			if offset > 0 and expected_batches > 0:
-				print("Retrieving data batch " + str(batch_number) + " of " + str(expected_batches + base_batch_number) + " from API...")
+				print("Retrieving data batch " + str(batch_number) + " of %d from API...", int(expected_batches + base_batch_number))
 			else:
 				print("Retrieving data batch " + str(batch_number) + " from API...")
 			response = requests.get(url, headers=headers)
 			print("... Retrieved data batch " + str(batch_number) + " from API")
-			batch_number += 1
 			results = parse(response.text)
 			if offset == 0:
 				expected_batches = results.Get("number_of_total_results")
