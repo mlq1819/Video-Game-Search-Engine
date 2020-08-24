@@ -9,6 +9,9 @@ platforms = [21,9,43]
 games = []
 max_elements = 100
 expected_fields = []
+force_start = False
+force_platform = 9
+force_offset = 700
 
 import requests
 from flask import Flask, render_template, request
@@ -96,11 +99,11 @@ def common_fields_list():
 		unsorted.append((datum[0],datum[1]))
 	sorted = []
 	while len(unsorted) > 0:
-		max = 0
+		max_value = 0
 		for datum in unsorted:
-			max = max(max, datum[1])
+			max_value = max(max_value, datum[1])
 		for datum in unsorted:
-			if datum[1] == max:
+			if datum[1] == max_value:
 				sorted.append((datum[0], datum[1]))
 				unsorted.remove(datum)
 				break
@@ -293,6 +296,7 @@ def parse(response):
 					index+=1
 				end = index
 				name = convert_to_type(response[start:middle])
+				print("\tCompleted section with name \"" + name + "\"")
 				data = convert_to_type(response[middle+1:end])
 				t = (name,data)
 				output.append(t)
@@ -316,43 +320,47 @@ if __name__ == '__main__':
 		offset = 0
 		base_batch_number = batch_number
 		expected_batches = -1
-		while(num_results == max_elements):
-			base_percent = (plat_num - 1) / len(platforms)
-			extra_percent = 0.0
-			if offset > 0 and expected_batches > 0:
-				extra_percent = ((batch_number - base_batch_number) / expected_batches) / len(platforms)
-			final_percent = round((base_percent + extra_percent) * 100, 2)
-			batch_number += 1
-			print(str(final_percent) + "% Completed")
-			url = baseUrl + resource + "/?api_key=" + key + "&format=json"
-			if offset > 0:
-				url = url + "&offset=" + str(offset)
-			url = url + "&platforms=" + str(platform)
-			#https://www.giantbomb.com/api/games/?api_key=6fe6fb576b0c7bef2364938b2248e1628759508d&format=json&platforms=21
-			print(url)
-			if offset > 0:
-				print(resource + " : platform " + str(platform) + " : offset " + str(offset))
-			else:
-				print(resource + " : platform " + str(platform))
-			if offset > 0 and expected_batches > 0:
-				print("Retrieving data batch " + str(batch_number) + " of " + str(int(expected_batches + base_batch_number)) + " from API...", )
-			else:
-				print("Retrieving data batch " + str(batch_number) + " from API...")
-			response = requests.get(url, headers=headers)
-			print("... Retrieved data batch " + str(batch_number) + " from API")
-			results = parse(response.text)
-			if offset == 0:
-				expected_batches = results.Get("number_of_total_results")
-				expected_batches = round(expected_batches / max_elements + 0.4999, 0)
-				print("Expecting " + str(expected_batches) + " batches for platform " + str(platform))
-			num_results = results.Get("number_of_page_results")
-			if response.status_code == 200 or response.status_code == 301:
-				add_games(results.Get("results"))
-			else:
-				hasnt_failed = False
-				print("Error code " + str(response.status_code))
-				print(response.reason)
-			offset = offset + num_results
+		if (not force_start) or force_platform == platform:
+			if force_start and not force_offset == "any":
+				offset = force_offset
+			while num_results == max_elements and ((not force_start) or (offset == force_offset) or (force_offset == "any")):
+				base_percent = (plat_num - 1) / len(platforms)
+				extra_percent = 0.0
+				if offset > 0 and expected_batches > 0:
+					extra_percent = ((batch_number - base_batch_number) / expected_batches) / len(platforms)
+				final_percent = round((base_percent + extra_percent) * 100, 2)
+				batch_number += 1
+				print(str(final_percent) + "% Completed")
+				url = baseUrl + resource + "/?api_key=" + key + "&format=json"
+				if offset > 0:
+					url = url + "&offset=" + str(offset)
+				url = url + "&platforms=" + str(platform)
+				#https://www.giantbomb.com/api/games/?api_key=6fe6fb576b0c7bef2364938b2248e1628759508d&format=json&platforms=21
+				print(url)
+				if offset > 0:
+					print(resource + " : platform " + str(platform) + " : offset " + str(offset))
+				else:
+					print(resource + " : platform " + str(platform))
+				if offset > 0 and expected_batches > 0:
+					print("Retrieving data batch " + str(batch_number) + " of " + str(int(expected_batches + base_batch_number)) + " from API...", )
+				else:
+					print("Retrieving data batch " + str(batch_number) + " from API...")
+				response = requests.get(url, headers=headers)
+				print("... Retrieved data batch " + str(batch_number) + " from API")
+				results = parse(response.text)
+				if offset == 0:
+					expected_batches = results.Get("number_of_total_results")
+					expected_batches = round(expected_batches / max_elements + 0.4999, 0)
+					print("Expecting " + str(expected_batches) + " batches for platform " + str(platform))
+				num_results = results.Get("number_of_page_results")
+				if response.status_code == 200 or response.status_code == 301:
+					add_games(results.Get("results"))
+				else:
+					hasnt_failed = False
+					print("Error code " + str(response.status_code))
+					print(response.reason)
+				offset = offset + num_results
+	print("100% Completed!")
 	if hasnt_failed:
 		app.run('localhost',5050) #5050 is what is currently set in the project Debug port number settings; both must be changed if either is
 	else:
