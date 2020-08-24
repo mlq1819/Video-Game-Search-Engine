@@ -9,7 +9,7 @@ platforms = [21,9,43]
 games = []
 max_elements = 100
 expected_fields = []
-force_start = False
+force_start = True
 force_platform = 9
 force_offset = 700
 
@@ -308,6 +308,8 @@ def parse(response):
 #Entry point into application; downloads and parses API data before starting the web application
 if __name__ == '__main__':
 	hasnt_failed = True
+	if force_start:
+		print("Forced start is on: platform=" + str(force_platform) + "; offset=" + str(force_offset))
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # This is chrome, you can set whatever browser you like
 	batch_number = 0
 	print("Requires batches for " + str(len(platforms)) + " platforms:")
