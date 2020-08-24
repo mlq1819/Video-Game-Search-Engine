@@ -84,7 +84,7 @@ def common_field(name):
 				sorted.append((datum[0], datum[1]))
 				unsorted.remove(datum)
 				break
-	return count >= sorted[int(len(sorted) * 3 / 4)][1]
+	return count >= max(sorted[int(len(sorted) * 3 / 4)][1] - 1, 1)
 
 #Gets a list of the common fields as tuples with the second index set to False
 def common_fields_list():
@@ -104,12 +104,22 @@ def common_fields_list():
 				sorted.append((datum[0], datum[1]))
 				unsorted.remove(datum)
 				break
-	check = sorted[int(len(sorted) * 3 / 4)][1]
+	check = max(sorted[int(len(sorted) * 3 / 4)][1] - 1, 1)
 	output = []
 	for datum in sorted:
 		if datum[1] >= check:
 			output.append((datum[0], False))
 	return output
+
+#checks whether there is an element of the list with tuple[0] == name that is set to false
+def check_fields_list(list, name):
+	for datum in list:
+		if datum[0] == name:
+			output = datum[1] == False
+			datum[1] = True
+			return output
+	list.append((name, True))
+	return False
 
 
 #takes a string of results and adds games from the generated list
@@ -128,6 +138,9 @@ def add_games(results):
 				if results[index] == '{': #found a game object
 					output = []
 					index+=1
+					fields_list = []
+					if games.count > 5:
+						fields_list = common_fields_list()
 					while index < len(results) and results[index] != '}': #loop between fields of game object, within game object
 						start = index
 						middle = index
@@ -185,20 +198,31 @@ def add_games(results):
 						end = index
 						if found_middle and index < len(results):
 							name = convert_to_type(results[start:middle])
-							if len(subobjects) == 0:
-								data = convert_to_type(results[middle+1:end])
-								t = (name,data)
-								output.append(t)
-							else:
-								i2 = 1
-								data = []
-								data.append(convert_to_type(results[middle+2:subobjects[0]]))
-								while i2 < len(subobjects):
-									data.append(convert_to_type(results[subobjects[i2-1]+1:subobjects[i2]]))
-									i2+=1
-								data.append(convert_to_type(results[subobjects[-1]+1:end-1]))
-								t = (name,data)
-								output.append(t)
+							if check_fields_list(fields_list, name): #ensures that duplicate data is not found
+								add_data_field(name)
+								if len(subobjects) == 0:
+									data = convert_to_type(results[middle+1:end])
+									t = (name,data)
+									output.append(t)
+								else:
+									i2 = 1
+									data = []
+									data.append(convert_to_type(results[middle+2:subobjects[0]]))
+									while i2 < len(subobjects):
+										data.append(convert_to_type(results[subobjects[i2-1]+1:subobjects[i2]]))
+										i2+=1
+									data.append(convert_to_type(results[subobjects[-1]+1:end-1]))
+									t = (name,data)
+									output.append(t)
+							else: #duplicate data has been found; need to double back and find the end of the current game
+								print("Data glitch detected; attempting to rewind to end of last element...")
+								print("\tData rewind started at index == " + str(index))
+								index = start
+								while index > 0 and index+2 < len(results) and results[index] != '}' and results[index+1] != ',' and results[index+2] != '{':
+									index -= 1 #backtracking to probable end of last game; might cause some glitches but should prevent issues
+								print("\tData rewind ended at index == " + str(index) + ": \"" + results[index:index+2] + '\"')
+								if index > 0 and index + 2 < len(results):
+									break
 						if results[index] == ',':
 							index+=1
 					#At end of game; results[index] == '}'; note: most games will end with a "},{", though one will end with "}]"
