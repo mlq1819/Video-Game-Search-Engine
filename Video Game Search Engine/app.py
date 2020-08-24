@@ -4,9 +4,11 @@ parsed = []
 key="6fe6fb576b0c7bef2364938b2248e1628759508d"
 baseUrl="https://www.giantbomb.com/api/"
 resource="games"
+non_plural="game"
 platforms = [21,9,43]
 games = []
 max_elements = 100
+expected_fields = []
 
 import requests
 from flask import Flask, render_template, request
@@ -54,6 +56,62 @@ def convert_to_type(object):
 		else:
 			return object
 
+#Either adds a new data field to expected_fields, or increments the element sharing the same name
+def add_data_field(name):
+	for datum in expected_fields:
+		if datum[0] == name:
+			datum[1] += 1
+			return
+	t = (name, 1)
+	expected_fields.append(t)
+	return
+
+#checks whether a particular field is a common field
+def common_field(name):
+	unsorted = []
+	count = 0
+	for datum in expected_fields:
+		unsorted.append((datum[0],datum[1]))
+		if datum[0] == name:
+			count = datum[1]
+	sorted = []
+	while len(unsorted) > 0:
+		max = 0
+		for datum in unsorted:
+			max = max(max, datum[1])
+		for datum in unsorted:
+			if datum[1] == max:
+				sorted.append((datum[0], datum[1]))
+				unsorted.remove(datum)
+				break
+	return count >= sorted[int(len(sorted) * 3 / 4)][1]
+
+#Gets a list of the common fields as tuples with the second index set to False
+def common_fields_list():
+	unsorted = []
+	count = 0
+	for datum in expected_fields:
+		unsorted.append((datum[0],datum[1]))
+		if datum[0] == name:
+			count = datum[1]
+	sorted = []
+	while len(unsorted) > 0:
+		max = 0
+		for datum in unsorted:
+			max = max(max, datum[1])
+		for datum in unsorted:
+			if datum[1] == max:
+				sorted.append((datum[0], datum[1]))
+				unsorted.remove(datum)
+				break
+	check = sorted[int(len(sorted) * 3 / 4)][1]
+	output = []
+	for datum in sorted:
+		if datum[1] >= check:
+			output.append((datum[0], False))
+	return output
+
+
 #takes a string of results and adds games from the generated list
 #results should be formatted as such: [{"Name":Data,"Name":Data,"Name":Data},{"Name":Data,"Name":Data,"Name":Data},{"Name":Data,"Name":Data,"Name":Data}]
 def add_games(results):
@@ -62,7 +120,7 @@ def add_games(results):
 	end = 0
 	index = 0
 	at_bad = False
-	print("Parsing game data...")
+	print("Parsing " + non_plural + " data...")
 	while index >= 0 and index < len(results):
 		if results[index] == '[':
 			index+=1
@@ -95,7 +153,7 @@ def add_games(results):
 												index += 1
 											html_end = index
 											to_fold = results[html_start:html_end+1]
-										if to_fold == folding[-1]:
+										if to_fold == folding[-1] and (to_fold != '\"' or (to_fold == '\"' and index > 0 and results[index-1] != '\\')):
 											folding.pop(-1)
 										elif to_fold[0] == '<' and len(to_fold) > 1 and to_fold[1] != '\\':
 											if to_fold[-3:-1] != "\\/":
@@ -151,23 +209,23 @@ def add_games(results):
 						while num_spaces > 0:
 							spaces = spaces + ' '
 							num_spaces -= 1
-						print("\tCompleted parsing of game with name \t\"" + (games[-1].Get("name")) + "\"" + spaces + " with " + str(len(games[-1].fields)) + " fields")
+						print("\tCompleted parsing of " + non_plural + " with name \t\"" + (games[-1].Get("name")) + "\"" + spaces + " with " + str(len(games[-1].fields)) + " data fields")
 						if games[-1].Get("name") == "A Week of Garfield":
 							at_bad = True
 					elif games[-1].Has("aliases"):
 						if isinstance(games[-1].Get("aliases"), str):
-							print("\tCompleted parsing of game with alias \"" + (games[-1].Get("aliases")) + "\"\t with " + str(len(games[-1].fields)) + " fields")
+							print("\tCompleted parsing of " + non_plural + " with alias \"" + (games[-1].Get("aliases")) + "\"\t with " + str(len(games[-1].fields)) + " data fields")
 						else:
-							print("\tCompleted parsing of game with alias \"" + (games[-1].Get("aliases"))[0] + "\"\t with " + str(len(games[-1].fields)) + " fields")
+							print("\tCompleted parsing of " + non_plural + " with alias \"" + (games[-1].Get("aliases"))[0] + "\"\t with " + str(len(games[-1].fields)) + " data fields")
 					else:
-						print("\tCompleted parsing of game with " + str(games[-1].GetFieldName(0)) + "\t with " + str(len(games[-1].fields)) + " fields")
+						print("\tCompleted parsing of game with " + str(games[-1].GetFieldName(0)) + "\t with " + str(len(games[-1].fields)) + " data fields")
 					while results[index] == '}' or results[index] == ',':
 						index+=1
 				if index < len(results) and results[index] != '{':
 					index+=1
 		#Possibly at end of list, results[index] either equals ']' or is out of range
 		index+=1
-	print("Completed parsing of game data")
+	print("Completed parsing of " + non_plural + " data")
 
 #Should convert information from response into a list of result objects
 #response should be formatted as such: {"Name":Data,"Name":Data,"Name":Data}
