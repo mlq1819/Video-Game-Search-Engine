@@ -10,8 +10,8 @@ games = []
 max_elements = 100
 expected_fields = []
 force_start = False
-force_platform = 9
-force_offset = 700
+force_platform = 0
+force_offset = any
 parse_blocks = []
 
 import requests
@@ -371,7 +371,7 @@ if __name__ == '__main__':
 		offset = 0
 		base_batch_number = batch_number
 		expected_batches = -1
-		if (not force_start) or force_platform == platform:
+		if (not force_start) or (force_platform == platform or force_platform == "any"):
 			if force_start and not force_offset == "any":
 				offset = force_offset
 			while num_results == max_elements and ((not force_start) or (offset == force_offset) or (force_offset == "any")):
