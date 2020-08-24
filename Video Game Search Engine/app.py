@@ -111,7 +111,7 @@ def common_fields_list():
 			output.append((datum[0], False))
 	return output
 
-#checks whether there is an element of the list with tuple[0] == name that is set to false
+#checks whether the data has not been added to the fields_list yet, and that if it is added, that it has not been marked True
 def check_fields_list(list, name):
 	for datum in list:
 		if datum[0] == name:
@@ -119,7 +119,7 @@ def check_fields_list(list, name):
 			datum[1] = True
 			return output
 	list.append((name, True))
-	return False
+	return True
 
 
 #takes a string of results and adds games from the generated list
@@ -139,7 +139,7 @@ def add_games(results):
 					output = []
 					index+=1
 					fields_list = []
-					if games.count > 5:
+					if len(games) > 5:
 						fields_list = common_fields_list()
 					while index < len(results) and results[index] != '}': #loop between fields of game object, within game object
 						start = index
