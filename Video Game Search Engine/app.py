@@ -177,8 +177,8 @@ def add_games(results):
 					toggle_print = False
 					if games[-1].Has("name") and isinstance(games[-1].Get("name"), str):
 						print("\tCompleted parsing of game with name \"" + (games[-1].Get("name")) + "\"\t with " + str(len(games[-1].fields)) + " fields")
-						if games[-1].Get("name") == "Faria: A World of Mystery and Danger!":
-							toggle_print = True
+						#if games[-1].Get("name") == "Faria: A World of Mystery and Danger!":
+						#	toggle_print = True
 					elif games[-1].Has("aliases"):
 						if isinstance(games[-1].Get("aliases"), str):
 							print("\tCompleted parsing of game with alias \"" + (games[-1].Get("aliases")) + "\"\t with " + str(len(games[-1].fields)) + " fields")
