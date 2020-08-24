@@ -258,6 +258,33 @@ def add_games(results):
 		index+=1
 	print("Completed parsing of " + non_plural + " data")
 
+def recurse_tuple1(tuple, depth):
+	output = ""
+	tab_string = "\t"
+	i = depth
+	while i > 0:
+		tab_string = tab_string + '\t'
+		i -= 1
+	if len(tuple[1]) > 0:
+		output = output + tab_string + '[' + '\n'
+		do_divider = False
+		for item in tuple[1]:
+			if do_divider:
+				output = output + tab_string + ',' + '\n'
+			else:
+				do_divider = True
+			output = output + recurse_tuple1(item, depth+1) + '\n'
+		output = output + tab_string + ']' + '\n'
+	else:
+		output += tab_string
+		max_len = 128
+		if len(tuple[0]) >= max_len:
+			output += "~len=" + str(len(tuple[0])) + "~ " + tuple[0][:max_len]
+		else:
+			output += tuple[0]
+		output += '\n'
+	return output
+
 #Should convert information from response into a list of result objects
 #response should be formatted as such: {"Name":Data,"Name":Data,"Name":Data}
 def parse(response):
@@ -289,6 +316,12 @@ def parse(response):
 						folding_indices.append(index)
 						while len(folding)>0:
 							index+=1
+							temp = ""
+							if force_start and len(response) == index + 1:
+								for block in folding_blocks:
+									temp = temp + recurse_tuple1(block, 0)
+								print(temp)
+								break
 							if response[index] == folding[-1]:
 								folding.pop(-1)
 								if force_start:
