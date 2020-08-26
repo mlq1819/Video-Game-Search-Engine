@@ -33,6 +33,7 @@ class countset(object):
     #adds a new string to the set, or increases the occurance of the set
     def Add(self, word):
         i = 0
+        word = word.upper()
         while i < len(self.set):
             tup = self.set[i]
             if word == tup[0]:
@@ -59,6 +60,7 @@ class countset(object):
     #decrements an object from the set, or deletes it entirely
     def Remove(self, word):
         i = 0
+        word = word.upper()
         while i < len(self.set):
             tup = self.set[i]
             if word == tup[0]:
@@ -85,6 +87,7 @@ class countset(object):
 
     #checks whether a particular object exists in the set
     def Has(self, word):
+        word = word.upper()
         for tup in self.set:
             if word == tup[0]:
                 return True
@@ -92,6 +95,7 @@ class countset(object):
     
     #returns the number of occurances of an object in the set
     def Get(self, word):
+        word = word.upper()
         for tup in self.set:
             if word == tup[0]:
                 return tup[1]
@@ -137,7 +141,7 @@ class countset(object):
  
             # pi is partitioning index, arr[p] is now
             # at right place
-            pi = partition(arr, low, high)
+            pi = self.partition(arr, low, high)
  
             # Separately sort elements before
             # partition and after partition
@@ -145,9 +149,17 @@ class countset(object):
             self.quickSort(arr, pi+1, high)
         return
 
+    def reverse(self):
+        i = 0
+        while i < int(len(self.set) / 2):
+            j = -1 * (i + 1)
+            self.set[i], self.set[j] = self.set[j], self.set[i]
+            i += 1
+
     #sorts the set by occurance rate
     def Sort(self):
         self.quickSort(self.set, 0, len(self.set)-1)
+        self.reverse()
         self.sorted = True
         return
 
