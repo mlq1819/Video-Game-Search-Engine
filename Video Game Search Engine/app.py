@@ -420,13 +420,15 @@ if __name__ == '__main__':
 		game = games[i]
 		percent = round((i / len(games)) * 100, 2)
 		if game.Has("name"):
-			name = game.get(name)
+			name = game.Get("name")
 			print(str(percent) + "% Completed - Generating keywords for \"" + name + "\"")
 		else:
 			print(str(percent) + "% Completed - Generating keywords for game #" + str(i+1))
 		for field in keyword_fields:
 			if game.Has(field):
-				data = game.Get(field)
+				data = str(game.Get(field))
+				print("\tGenerating keywords for field with name \"" + field + "\"")
+				print("\t\tData = \"" + data + "\"")
 				if data != "null":
 					if field == "description" or data.count("<p>") > 0:
 						keywords.AddHTMLBlock(data)

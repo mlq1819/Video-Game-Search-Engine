@@ -37,13 +37,16 @@ class countset(object):
             tup = self.set[i]
             if str == tup[0]:
                 self.set[i] = (tup[0], tup[1] + 1)
+                print("\t\t\tAdded \"" + str + "\":" + str(tup[1]))
                 if self.sorted:
                     if i > 0 and self.set[i][1] > self.set[i-1][1]:
                         self.sorted = False
                     if i+1 < len(self.set) and self.set[i][1] < self.set[i+1][1]:
                         self.sorted = False
                 return True
+            i += 1
         self.set.append((str, 1))
+        print("\t\t\tAdded \"" + str + "\":1")
         self.sorted = False
         return True
 
@@ -51,7 +54,7 @@ class countset(object):
     def AddSet(self, strset):
         count = 0
         for str in strset:
-            if Add(self, str):
+            if self.Add(str):
                 count += 1
         return count
 
@@ -71,13 +74,14 @@ class countset(object):
                 else:
                     self.set.pop(i)
                 return True
+            i += 1
         return False
     
     #performs the Remove function on a set of strings
     def RemoveSet(self, strset):
         count = 0
         for str in strset:
-            if Remove(self, str):
+            if self.Remove(str):
                 count += 1
         return count
 
@@ -175,6 +179,7 @@ class countset(object):
             return self.set[index][1]
 
     #extracts text from html code and converts it into a single string
+    @staticmethod
     def ExtractFromHTML(block):
         output = ""
         index = 0
@@ -226,6 +231,7 @@ class countset(object):
         return output
 
     #breaks a text block into words and adds each word to the set
+    @staticmethod
     def BreakTextBlock(block):
         words = []
         current_word = ""
@@ -252,6 +258,7 @@ class countset(object):
         return words
 
     #extracts a set of phrases from a set of strings
+    @staticmethod
     def ExtractPhrases(strlist):
         output = []
         i = 0
@@ -262,11 +269,11 @@ class countset(object):
 
     #parses a text block by dividing it into words and phrases and adds each word to the set
     def AddTextBlock(self, block):
-        word_list = BreakTextBlock(block)
+        word_list = countset.BreakTextBlock(block)
         self.AddSet(word_list)
-        phrase_list = ExtractPhrases(strlist)
+        phrase_list = countset.ExtractPhrases(word_list)
         self.AddSet(phrase_list)
 
     #parses an html block and then calls AddTextBlock
     def AddHTMLBlock(self, html_block):
-        return self.AddTextBlock(ExtractFromHTML(html_block))
+        return self.AddTextBlock(countset.ExtractFromHTML(html_block))
