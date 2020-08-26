@@ -36,7 +36,7 @@ class countset(object):
         word = word.upper()
         while i < len(self.set):
             tup = self.set[i]
-            if word == tup[0]:
+            if word == tup[0][0]:
                 self.set[i] = (tup[0], tup[1] + 1)
                 if self.sorted:
                     if i > 0 and self.set[i][1] > self.set[i-1][1]:
@@ -45,7 +45,7 @@ class countset(object):
                         self.sorted = False
                 return True
             i += 1
-        self.set.append((word, 1))
+        self.set.append(((word, []), 1))
         self.sorted = False
         return True
 
@@ -57,13 +57,30 @@ class countset(object):
                 count += 1
         return count
 
+    #adds a given phrase to all words in the phrase
+    def AddPhrase(self, phrase):
+        words = countset.BreakTextBlock(phrase)
+        count = 0
+        for word in words:
+            i = 0
+            while i < len(self.set):
+                tup = self.set[i]
+                if word == tup[0][0]:
+                    list = tup[0][1]
+                    list.append(phrase)
+                    self.set[i] = ((word, list), tup[1])
+                    count += 1
+                    break
+                i+=1
+        return count
+
     #decrements an object from the set, or deletes it entirely
     def Remove(self, word):
         i = 0
         word = word.upper()
         while i < len(self.set):
             tup = self.set[i]
-            if word == tup[0]:
+            if word == tup[0][0]:
                 if tup[1] > 1:
                     self.set[i] = (tup[0], tup[1] - 1)
                     if self.sorted:
@@ -83,6 +100,23 @@ class countset(object):
         for str in strset:
             if self.Remove(str):
                 count += 1
+        return count
+
+    #removes a given phrase from all words in the phrase
+    def RemovePhrase(self, phrase):
+        words = countset.BreakTextBlock(phrase)
+        count = 0
+        for word in words:
+            i = 0
+            while i < len(self.set):
+                tup = self.set[i]
+                if word == tup[0][0]:
+                    list = tup[0][1]
+                    list.remove(phrase)
+                    self.set[i] = ((word, list), tup[1])
+                    count += 1
+                    break
+                i+=1
         return count
 
     #checks whether a particular object exists in the set
@@ -295,8 +329,9 @@ class countset(object):
         word_list = countset.BreakTextBlock(block)
         count = self.AddSet(word_list)
         phrase_list = countset.ExtractPhrases(word_list)
-        count += self.AddSet(phrase_list)
-        print("Added " + str(count) + " words and phrases")
+        for phrase in phrase_list:
+            self.AddPhrase(phrase)
+        print("Added " + str(count) + " words")
         self.Sort()
 
     #parses an html block and then calls AddTextBlock
