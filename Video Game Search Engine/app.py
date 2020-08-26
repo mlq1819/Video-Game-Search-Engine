@@ -431,7 +431,7 @@ if __name__ == '__main__':
 				if data != "null":
 					expected = data.count(' ') + data.count('.') + 1
 					divisor = max(1, math.log10(expected) / 2)
-					expected = expected / divisor
+					expected = max(1, int(expected / divisor))
 					print("\tGenerating keywords from " + field + "; expecting roughly " + str(expected) + "...")
 					if field == "description" or data.count("<p>") > 0:
 						keywords.AddHTMLBlock(data)
