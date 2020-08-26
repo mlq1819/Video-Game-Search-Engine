@@ -128,7 +128,6 @@ def check_fields_list(list, name):
 	list.append((name, True))
 	return True
 
-
 #takes a string of results and adds games from the generated list
 #results should be formatted as such: [{"Name":Data,"Name":Data,"Name":Data},{"Name":Data,"Name":Data,"Name":Data},{"Name":Data,"Name":Data,"Name":Data}]
 def add_games(results):
