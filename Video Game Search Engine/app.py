@@ -427,9 +427,8 @@ if __name__ == '__main__':
 		for field in keyword_fields:
 			if game.Has(field):
 				data = str(game.Get(field))
-				print("\tGenerating keywords from " + field + "...")
-				print("\t\tData = \"" + data + "\"")
 				if data != "null":
+					print("\tGenerating keywords from " + field + "...")
 					if field == "description" or data.count("<p>") > 0:
 						keywords.AddHTMLBlock(data)
 					else:
