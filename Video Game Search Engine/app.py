@@ -1,5 +1,6 @@
 from result import tuplelist
 from result import countset
+import math
 
 parsed = []
 key="6fe6fb576b0c7bef2364938b2248e1628759508d"
@@ -429,6 +430,8 @@ if __name__ == '__main__':
 				data = str(game.Get(field))
 				if data != "null":
 					expected = data.count(' ') + data.count('.') + 1
+					divisor = max(1, math.log10(expected) / 2)
+					expected = expected / divisor
 					print("\tGenerating keywords from " + field + "; expecting roughly " + str(expected) + "...")
 					if field == "description" or data.count("<p>") > 0:
 						keywords.AddHTMLBlock(data)
