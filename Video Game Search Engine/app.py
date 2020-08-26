@@ -11,9 +11,9 @@ games = []
 keyword_fields = ["aliases", "expected_release_day", "expected_release_month", "expected_release_year", "name", "original_release_date", "deck", "description"]
 max_elements = 100
 expected_fields = []
-force_start = False
-force_platform = 0
-force_offset = any
+force_start = True
+force_platform = 9
+force_offset = 0
 parse_blocks = []
 keywords = countset()
 
@@ -433,6 +433,8 @@ if __name__ == '__main__':
 					else:
 						keywords.AddTextBlock(data)
 		i += 1
+	print("100% Completed!")
+	print("Starting server...")
 	if hasnt_failed:
 		app.run('localhost',5050) #5050 is what is currently set in the project Debug port number settings; both must be changed if either is
 	else:
