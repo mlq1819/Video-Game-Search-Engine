@@ -31,13 +31,12 @@ class countset(object):
         self.sorted = True
 
     #adds a new string to the set, or increases the occurance of the set
-    def Add(self, str):
+    def Add(self, word):
         i = 0
         while i < len(self.set):
             tup = self.set[i]
-            if str == tup[0]:
+            if word == tup[0]:
                 self.set[i] = (tup[0], tup[1] + 1)
-                print("\t\t\tAdded \"" + str + "\":" + str(tup[1]))
                 if self.sorted:
                     if i > 0 and self.set[i][1] > self.set[i-1][1]:
                         self.sorted = False
@@ -45,8 +44,7 @@ class countset(object):
                         self.sorted = False
                 return True
             i += 1
-        self.set.append((str, 1))
-        print("\t\t\tAdded \"" + str + "\":1")
+        self.set.append((word, 1))
         self.sorted = False
         return True
 
@@ -59,11 +57,11 @@ class countset(object):
         return count
 
     #decrements an object from the set, or deletes it entirely
-    def Remove(self, str):
+    def Remove(self, word):
         i = 0
         while i < len(self.set):
             tup = self.set[i]
-            if str == tup[0]:
+            if word == tup[0]:
                 if tup[1] > 1:
                     self.set[i] = (tup[0], tup[1] - 1)
                     if self.sorted:
@@ -86,16 +84,16 @@ class countset(object):
         return count
 
     #checks whether a particular object exists in the set
-    def Has(self, str):
+    def Has(self, word):
         for tup in self.set:
-            if str == tup[0]:
+            if word == tup[0]:
                 return True
         return False
     
     #returns the number of occurances of an object in the set
-    def Get(self, str):
+    def Get(self, word):
         for tup in self.set:
-            if str == tup[0]:
+            if word == tup[0]:
                 return tup[1]
         return 0
 
@@ -152,6 +150,15 @@ class countset(object):
         self.quickSort(self.set, 0, len(self.set)-1)
         self.sorted = True
         return
+
+    #gets and returns the Average occurance number
+    def Average(self):
+        if len(self.set) == 0:
+            return None
+        sum = 0
+        for item in self.set:
+            sum += item[1]
+        return sum / len(self.set)
 
     #gets and returns the Median occurance number
     def Median(self):
@@ -255,6 +262,9 @@ class countset(object):
             else:
                 current_word += char
             i+=1
+        if current_word != "":
+            words.append(current_word)
+            current_word = ""
         return words
 
     #extracts a set of phrases from a set of strings
@@ -265,14 +275,17 @@ class countset(object):
         while i+2 < len(strlist):
             phrase = strlist[i] + ' ' + strlist[i+1] + ' ' + strlist[i+2]
             output.append(phrase)
+            i+=1
         return output
 
     #parses a text block by dividing it into words and phrases and adds each word to the set
     def AddTextBlock(self, block):
         word_list = countset.BreakTextBlock(block)
-        self.AddSet(word_list)
+        count = self.AddSet(word_list)
         phrase_list = countset.ExtractPhrases(word_list)
-        self.AddSet(phrase_list)
+        count += self.AddSet(phrase_list)
+        print("Added " + str(count) + " words and phrases")
+        self.Sort()
 
     #parses an html block and then calls AddTextBlock
     def AddHTMLBlock(self, html_block):

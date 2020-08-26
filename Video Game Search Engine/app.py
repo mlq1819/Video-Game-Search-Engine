@@ -427,7 +427,7 @@ if __name__ == '__main__':
 		for field in keyword_fields:
 			if game.Has(field):
 				data = str(game.Get(field))
-				print("\tGenerating keywords for field with name \"" + field + "\"")
+				print("\tGenerating keywords from " + field + "...")
 				print("\t\tData = \"" + data + "\"")
 				if data != "null":
 					if field == "description" or data.count("<p>") > 0:
