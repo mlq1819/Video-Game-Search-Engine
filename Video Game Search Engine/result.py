@@ -192,9 +192,11 @@ class countset(object):
 
     #sorts the set by occurance rate
     def Sort(self):
+        print("\t\t\tSorting " + str(len(self.set)) + " words...")
         self.quickSort(self.set, 0, len(self.set)-1)
         self.reverse()
         self.sorted = True
+        print("\t\t\tCompleted sorting")
         return
 
     #gets and returns the Average occurance number
@@ -331,7 +333,7 @@ class countset(object):
         phrase_list = countset.ExtractPhrases(word_list)
         for phrase in phrase_list:
             self.AddPhrase(phrase)
-        print("Added " + str(count) + " words")
+        print("\t\tAdded " + str(count) + " words; " + str(len(self.set)) + " total")
         self.Sort()
 
     #parses an html block and then calls AddTextBlock
