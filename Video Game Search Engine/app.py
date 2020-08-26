@@ -1,4 +1,5 @@
 from result import tuplelist
+from result import countset
 
 parsed = []
 key="6fe6fb576b0c7bef2364938b2248e1628759508d"
@@ -7,12 +8,14 @@ resource="games"
 non_plural="game"
 platforms = [21,9,43]
 games = []
+keyword_fields = ["aliases", "expected_release_day", "expected_release_month", "expected_release_year", "name", "original_release_date", "deck", "description"]
 max_elements = 100
 expected_fields = []
 force_start = False
 force_platform = 0
 force_offset = any
 parse_blocks = []
+keywords = countset()
 
 import requests
 from flask import Flask, render_template, request
@@ -411,6 +414,25 @@ if __name__ == '__main__':
 					print(response.reason)
 				offset = offset + num_results
 	print("100% Completed!")
+	print("Parsing keywords!")
+	i = 0
+	while i < len(games):
+		game = games[i]
+		percent = round((i / len(games)) * 100, 2)
+		if game.Has("name"):
+			name = game.get(name)
+			print(str(percent) + "% Completed - Generating keywords for \"" + name + "\"")
+		else:
+			print(str(percent) + "% Completed - Generating keywords for game #" + str(i+1))
+		for field in keyword_fields:
+			if game.Has(field):
+				data = game.Get(field)
+				if data != "null":
+					if field == "description" or data.count("<p>") > 0:
+						keywords.AddHTMLBlock(data)
+					else:
+						keywords.AddTextBlock(data)
+		i += 1
 	if hasnt_failed:
 		app.run('localhost',5050) #5050 is what is currently set in the project Debug port number settings; both must be changed if either is
 	else:
