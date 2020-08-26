@@ -333,7 +333,10 @@ class countset(object):
         phrase_list = countset.ExtractPhrases(word_list)
         for phrase in phrase_list:
             self.AddPhrase(phrase)
-        print("\t\tAdded " + str(count) + " words; " + str(len(self.set)) + " total")
+        word_str = "words"
+        if count == 1:
+            word_str = "word"
+        print("\t\tAdded " + str(count) + ' ' + word_str + "; " + str(len(self.set)) + " total")
         self.Sort()
 
     #parses an html block and then calls AddTextBlock

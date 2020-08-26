@@ -428,8 +428,8 @@ if __name__ == '__main__':
 			if game.Has(field):
 				data = str(game.Get(field))
 				if data != "null":
-					expected = data.count(' ') + data.count('.')
-					print("\tGenerating keywords from " + field + "; expecting roughly " + expected + "...")
+					expected = data.count(' ') + data.count('.') + 1
+					print("\tGenerating keywords from " + field + "; expecting roughly " + str(expected) + "...")
 					if field == "description" or data.count("<p>") > 0:
 						keywords.AddHTMLBlock(data)
 					else:
